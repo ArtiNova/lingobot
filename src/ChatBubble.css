@@ -1,0 +1,60 @@
+.chat-bubble-container {
+    display: block;
+    max-width: 70%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    margin-bottom: 10px; /* Add some spacing between chat bubbles */
+    overflow-y: auto;
+}
+
+.ai-message {
+    text-align: left; /* AI messages on the left */
+}
+
+/* Add a class for user messages */
+.user-message {
+    text-align: right; /* User messages on the right */
+}
+
+
+.chat-bubble {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin: 10px 0;
+    max-width: 70%;
+    display: inline-block;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    width: auto;
+}
+
+.ai-message .chat-bubble {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 10px;
+}
+
+.user-message .chat-bubble {
+    background-color: #333; /* User messages in a different color */
+    color: #fff;
+    border-radius: 10px;
+}
+
+.chat-messages {
+    max-height: 60vh; /* Set a maximum height for the chat messages container */
+}
+
+.chat-bubble.user {
+    background-color: #0074cc; /* You can customize the color for user messages */
+    float: right; /* Float user messages to the right */
+    clear: both; /* Clear any previous floats */
+}
+
+.chat-bubble.other {
+    background-color: #009688; /* You can customize the color for other messages */
+    float: left; /* Float other messages to the left */
+    clear: both; /* Clear any previous floats */
+}
+

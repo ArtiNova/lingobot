@@ -1,0 +1,74 @@
+/* Login.css */
+
+/* Body styles for dark mode */
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* Container for the login page */
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Title styles */
+.login-title h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: rgb(210, 146, 255); /* You can use your preferred accent color */
+}
+
+/* Container for the login form */
+.login-container {
+    background-color: #1f1f1f;
+    padding: 40px; /* Increase padding to make it larger */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Form styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Input field styles */
+.input-field {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 5px;
+}
+
+/* Login and Signup button styles */
+.login-button,
+.signup-button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    background-color: rgb(210, 146, 255); /* Accent color */
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover,
+.signup-button:hover {
+    background-color: #5089a6; /* Darker shade of accent color on hover */
+}
+
+.error-message {
+    color : red;
+}

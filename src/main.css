@@ -1,0 +1,181 @@
+/* Main.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    background-color: #333;
+    color: #fff;
+    flex: 1;
+    padding: 20px;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sidebar h2 {
+    margin-bottom: 10px;
+    border-top: 1px solid #fff; /* Add a horizontal line separator */
+    padding-top: 10px; /* Add some spacing above the line */
+}
+
+.sidebar-button {
+    background-color: #333;
+    color: #fff;
+    border : none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.sidebar-button:hover {
+    background-color: #444;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-button:focus {
+    outline: none;
+}
+
+.chat-interface {
+    flex: 2;
+    padding: 20px;
+    background-color: black;
+    overflow-y: auto;
+}
+
+/* Define the appearance of the thumb (the draggable part) of the scrollbar */
+.chat-interface::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Color of the thumb */
+    border: 4px solid transparent; /* Transparent border for a sleeker look */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    background-clip: content-box; /* Ensure the background only applies to the thumb */
+}
+
+/* Define the appearance of the track (the non-draggable part) of the scrollbar */
+.chat-interface::-webkit-scrollbar-track {
+    background-color: #333; /* Color of the track */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+/* Add a subtle glow effect on hover */
+.chat-interface::-webkit-scrollbar-thumb:hover {
+    background-color: #0056b3; /* Color on hover */
+}
+.chat-bubble-container {
+    display: inline-block;
+    max-width: 70%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.chat-bubble {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin: 10px 0;
+    max-width: 70%;
+    display: inline-block;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    width: auto;
+}
+
+
+
+.user-input {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 1; /* Corrected 'left' property value */
+    right: 0;
+    background-color: black;
+    padding: 10px;
+    width: 81%;
+}
+
+.user-input input {
+    width: 60%; /* Adjusted width value */
+    padding: 5px;
+    height: 30px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    background-color: rgb(57, 57, 57);
+    color: whitesmoke;
+    flex-grow: 1; /* Added flex-grow property to expand input */
+}
+
+.user-input button {
+    background-color: rgb(53, 53, 53);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    box-shadow: 0px 5px 0px 0px #000;
+}
+
+.user-input button:hover {
+    background-color: #0056b3;
+    transform: translateY(2px);
+}
+
+.user-input button:active {
+    transform: translateY(4px);
+}
+
+.avatar {
+    width: 30px; /* Adjust the width of the avatars as needed */
+    height: 30px; /* Adjust the height of the avatars as needed */
+    margin-right: 10px; /* Add spacing between avatar and message */
+    border-radius: 50%; /* Make avatars circular */
+}
+
+
+.sidebar-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-button {
+    background-color: #333;
+    color: #fff;
+    border : none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease-in-out;
+    font-size: x-large;
+}
+
+.delete-button:hover {
+    color: darkred;
+}
+
+.dotLoading {
+    height: 20px;
+    width: 20px;
+    display: block;
+}

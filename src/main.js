@@ -30,11 +30,11 @@ class Main extends Component {
     addNewChat = () => {
         axios.post("http://localhost:5500/api/newChat", {
             "username": window.sessionStorage.getItem("username"),
-            "title": "New Chat " + this.state.messages.length + 1
+            "title": "New Chat " + this.state.previous.length
         })
             .then(response => {
                 if (response.data) {
-                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.messages.length + 1], selectedConv: "New Chat " + this.state.messages.length + 1, messages: [] })
+                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.previous.length], selectedConv: "New Chat " + this.state.previous.length, messages: [] })
 
                 }
             })
@@ -65,18 +65,18 @@ class Main extends Component {
                         "title": this.state.selectedConv
                     })
                     this.setState({ messages: [...this.state.messages, response.data.result], isLoading: false, context: response.data.context })
-                    if (this.state.messages.length === 2) {
+                    if (this.state.selectedConv.startsWith("New Chat")) {
                         axios.post("http://localhost:5501/api/nameTitle", {
                             question: response.data.context
                         }).then(response => {
-                            let index = this.state.messages.indexOf(this.state.selectedConv)
-                            let mess_temp = this.state.messages
-                            const oldTitle = mess_temp[index]
-                            mess_temp[index] = response.data
-                            this.setState({ messages: mess_temp })
+                            let index = this.state.previous.indexOf(this.state.selectedConv)
+                            let prev_temp = this.state.previous
+                            const oldTitle = this.state.selectedConv
+                            prev_temp[index] = response.data
+                            this.setState({ previous: prev_temp })
                             axios.post("http://localhost:5500/api/renameTitle", {
                                 "username": window.sessionStorage.getItem("username"),
-                                "title": oldTitle,
+                                "oldTitle": oldTitle,
                                 "newTitle": response.data
                             })
                         })

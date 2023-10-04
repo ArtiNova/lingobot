@@ -44,9 +44,9 @@ AI:
 """
 
 template_title = """Give a name for a conversation between Human and AI
-The human just had this conversation with the AI
-{question}
-The name should be a one liner
+The human just had this conversation with the AI:
+"{question}"
+The name should be a one-liner, and the output must be just the title.
 """
 
 def translate(txt, src, to):
@@ -57,6 +57,7 @@ def translate(txt, src, to):
 
 @app.post('/api/nameTitle')
 async def nameTitle(request : nameTitleRequest):
+    print("Renaming!!")
     question = request.question
     return model.generate(template_title.format(question = question))
 

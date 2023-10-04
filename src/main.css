@@ -3,6 +3,13 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    font-size: 16px;
+}
+
+@media (min-width : 768px) {
+    body {
+        font-size: 16px;
+    }
 }
 
 .container {
@@ -106,7 +113,7 @@ body {
     right: 0;
     background-color: black;
     padding: 10px;
-    width: 81%;
+    width: 71%;
 }
 
 .user-input input {
@@ -152,9 +159,10 @@ body {
 
 .sidebar-button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Change to flex-start to keep buttons on the same line */
     align-items: center;
 }
+
 
 .delete-button {
     background-color: #333;
@@ -163,9 +171,9 @@ body {
     border-radius: 5px;
     padding: 10px 20px;
     margin-bottom: 10px;
-    text-align: left;
+    text-align: center;
     cursor: pointer;
-    width: 100%;
+    width: auto;
     transition: background-color 0.3s ease-in-out;
     font-size: x-large;
 }

@@ -17,8 +17,6 @@ class Main extends Component {
             isLoading: false,
             previous: [],
             selectedConv: '',
-            newChatCount: 1,
-            selectedConvButton: null
         };
     }
 
@@ -32,12 +30,12 @@ class Main extends Component {
     addNewChat = () => {
         axios.post("http://localhost:5500/api/newChat", {
             "username": window.sessionStorage.getItem("username"),
-            "title": "New Chat " + this.state.newChatCount
+            "title": "New Chat " + this.state.messages.length + 1
         })
             .then(response => {
                 if (response.data) {
-                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.newChatCount], selectedConv: "New Chat " + this.state.newChatCount, newChatCount: this.state.newChatCount + 1 })
-                    this.loadPrevious()
+                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.messages.length + 1], selectedConv: "New Chat " + this.state.messages.length + 1, messages: [] })
+
                 }
             })
             .catch(error => {
@@ -50,7 +48,7 @@ class Main extends Component {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
             }
-            this.setState({messages : [...this.state.messages, this.state.userInput], userInput : '', isLoading : true})
+            this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
             axios.post("http://localhost:5501/api/inference", {
                 "input": this.state.userInput,
                 "context": this.state.context
@@ -67,7 +65,22 @@ class Main extends Component {
                         "title": this.state.selectedConv
                     })
                     this.setState({ messages: [...this.state.messages, response.data.result], isLoading: false, context: response.data.context })
-
+                    if (this.state.messages.length === 2) {
+                        axios.post("http://localhost:5501/api/nameTitle", {
+                            question: response.data.context
+                        }).then(response => {
+                            let index = this.state.messages.indexOf(this.state.selectedConv)
+                            let mess_temp = this.state.messages
+                            const oldTitle = mess_temp[index]
+                            mess_temp[index] = response.data
+                            this.setState({ messages: mess_temp })
+                            axios.post("http://localhost:5500/api/renameTitle", {
+                                "username": window.sessionStorage.getItem("username"),
+                                "title": oldTitle,
+                                "newTitle": response.data
+                            })
+                        })
+                    }
                 })
                 .catch(error => {
                     alert(error)
@@ -82,7 +95,6 @@ class Main extends Component {
         })
             .then(response => {
                 this.setState({ messages: response.data.messages, newChatCount: response.data.messages.length })
-                this.setState({ selectedConvButton: event.target })
                 this.setState({ context: response.data.context })
                 console.log(this.state.context)
                 console.log(this.state)

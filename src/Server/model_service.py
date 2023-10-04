@@ -4,6 +4,7 @@ import gpt4all
 from ReqResBody import Request
 import os
 from transformers import MBartForConditionalGeneration, MBart50TokenizerFast
+from nameTitleRequest import nameTitleRequest
 
 if not os.path.exists('./translation_model'):
     translation_model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50-many-to-many-mmt")
@@ -43,8 +44,9 @@ AI:
 """
 
 template_title = """Give a name for a conversation between Human and AI
-The human asked this question
+The human just had this conversation with the AI
 {question}
+The name should be a one liner
 """
 
 def translate(txt, src, to):
@@ -54,7 +56,7 @@ def translate(txt, src, to):
     return tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
 
 @app.post('/api/nameTitle')
-async def nameTitle(request):
+async def nameTitle(request : nameTitleRequest):
     question = request.question
     return model.generate(template_title.format(question = question))
 

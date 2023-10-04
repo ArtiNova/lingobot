@@ -11,6 +11,7 @@ from Previous import PreviousRequest
 from forConversation import conversationRequest
 from UpdateChatRequest import UpdateChatRequest, UpdateCurrentRequest
 from UpdateContext import UpdateContext
+from updateTitle import UpdateTitle
 
 MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
 client = MongoClient(MONGO_URI)
@@ -130,8 +131,8 @@ async def deleteConv(request: UpdateChatRequest):
     return True
 
 @app.post('/api/renameTitle')
-async def renameTitle(request):
-    username, oldtitle, newtitle = request.username, request.oldtitle, request.title
+async def renameTitle(request : UpdateTitle):
+    username, oldtitle, newtitle = request.username, request.oldTitle, request.newTitle
     chat_collection.update_one({"username" : username, "title" : oldtitle}, {"$set" : {
        "title" : newtitle 
     }})

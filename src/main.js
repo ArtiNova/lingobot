@@ -34,7 +34,7 @@ class Main extends Component {
         })
             .then(response => {
                 if (response.data) {
-                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.previous.length], selectedConv: "New Chat " + this.state.previous.length, messages: [] })
+                    this.setState({ previous: [...this.state.previous, "New Chat " + this.state.previous.length], selectedConv: "New Chat " + this.state.previous.length, messages: [], context : '' })
 
                 }
             })
@@ -122,7 +122,7 @@ class Main extends Component {
         const updatedPrevious = [...this.state.previous];
         const title = updatedPrevious[index]
         updatedPrevious.splice(index, 1);
-        this.setState({ previous: updatedPrevious, messages: [] });
+        this.setState({ previous: updatedPrevious, messages: [], context : '' });
         axios.post("http://localhost:5500/api/deleteConv", {
             username: window.sessionStorage.getItem("username"),
             "title": title
@@ -172,7 +172,6 @@ class Main extends Component {
                         />
                         <button onClick={this.handleSend} disabled={this.state.isLoading}>
                             {(this.state.isLoading === false) ? "▶" : <img className='dotLoading' src={dotLoading} alt={"gif"}></img>
-
                             }
                         </button>
                     </div>

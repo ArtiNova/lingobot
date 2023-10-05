@@ -6,6 +6,8 @@ import axios from "axios";
 import userAvatar from './user-avatar.png'; // Import the user avatar image
 import aiAvatar from './ai-avatar.png';
 import dotLoading from './load.gif'
+import editLogo from './edit.png';
+import delete_logo from './delete.png';
 
 class Main extends Component {
     constructor(props) {
@@ -17,6 +19,8 @@ class Main extends Component {
             isLoading: false,
             previous: [],
             selectedConv: '',
+            editingIndex : null,
+            newTitle : '',
         };
     }
 
@@ -89,20 +93,22 @@ class Main extends Component {
     }
 
     loadPrevious = (event) => {
-        axios.post("http://localhost:5500/api/loadPrevious", {
-            "username": window.sessionStorage.getItem("username"),
-            "title": event.target.innerHTML
-        })
-            .then(response => {
-                this.setState({ messages: response.data.messages, newChatCount: response.data.messages.length })
-                this.setState({ context: response.data.context })
-                console.log(this.state.context)
-                console.log(this.state)
+        if (this.state.editingIndex === null) {
+            axios.post("http://localhost:5500/api/loadPrevious", {
+                "username": window.sessionStorage.getItem("username"),
+                "title": event.target.innerHTML
             })
-            .catch(error => {
-                alert(error)
-            })
-        this.setState({ selectedConv: event.target.innerHTML })
+                .then(response => {
+                    this.setState({ messages: response.data.messages, newChatCount: response.data.messages.length })
+                    this.setState({ context: response.data.context })
+                    console.log(this.state.context)
+                    console.log(this.state)
+                })
+                .catch(error => {
+                    alert(error)
+                })
+            this.setState({ selectedConv: event.target.innerHTML })
+        }
     }
 
     getPrevious = () => {
@@ -129,6 +135,18 @@ class Main extends Component {
         })
     }
 
+    rename = (oldTitle, newTitle, index) => {
+        let updatePrevious = [...this.state.previous];
+        updatePrevious[index] = newTitle;
+        this.setState( {previous : updatePrevious} );
+        axios.post("http://localhost:5500/api/renameTitle", {
+            "username" : window.sessionStorage.getItem("username"),
+            "oldTitle" : oldTitle,
+            "newTitle" : newTitle 
+        })
+        this.setState({editingIndex : null, newTitle : ''})
+    }
+
     render() {
         if (!window.sessionStorage.getItem('Logged In')) {
             return <Navigate to='/' />
@@ -143,11 +161,14 @@ class Main extends Component {
                     <ul>
                         {this.state.previous.map((title, index) => (
                             <div key={index} className="sidebar-button-container">
-                                <button className='sidebar-button' onClick={this.loadPrevious}>
+                                {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value = {this.state.newTitle} onChange = {(event) => {this.setState({newTitle : event.target.value})}}  onKeyDown={(event) => {if (event.key === 'Enter') {this.rename(title, event.target.value, index)}}}></input> : 
+                                <button id={index} className='sidebar-button' onClick={this.loadPrevious}>
                                     {title}
                                 </button>
+                                }
+                                <button className='delete-button' onClick={() => {this.setState({editingIndex : index, newTitle : title})}}><img className = 'edit-logo' alt={"rename"} src={editLogo}></img></button>
                                 <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
-                                    🗑
+                                    <img className='edit-logo' alt={"delete"} src = {delete_logo}></img>
                                 </button>
                             </div>
                         ))}

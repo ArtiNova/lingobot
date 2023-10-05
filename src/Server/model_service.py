@@ -45,8 +45,8 @@ AI:
 
 template_title = """Give a name for a conversation between Human and AI
 The human just had this conversation with the AI:
+Just give me a title. Nothing else. Stick to the conversation details given. Don't be too creative
 "{question}"
-The name should be a one-liner, and the output must be just the title.
 """
 
 def translate(txt, src, to):

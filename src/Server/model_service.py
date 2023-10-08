@@ -43,10 +43,9 @@ Human:{input}
 AI:
 """
 
-template_title = """Give a name for a conversation between Human and AI
-The human just had this conversation with the AI:
-Just give me a title. Nothing else. Stick to the conversation details given. Don't be too creative
+template_title = """What is the main topic of this conversation
 "{question}"
+Stick to the conversation details given. Don't be too creative.
 """
 
 def translate(txt, src, to):

@@ -1,4 +1,4 @@
-import React, { Component} from 'react';
+import React, { Component } from 'react';
 import './Login.css';
 import axios from "axios";
 import { Navigate } from "react-router-dom";
@@ -11,7 +11,7 @@ class Login extends Component {
     this.state = {
       username: '',
       password: '',
-      error : ''
+      error: ''
     };
   }
   handleChange = (event) => {
@@ -21,57 +21,63 @@ class Login extends Component {
 
   login = (username, password) => {
     return axios.post("http://localhost:5500/api/login", {
-        "username" : username,
-        "password" : password
-   })
+      "username": username,
+      "password": password
+    })
   }
 
   signup = (username, password) => {
     return axios.post("http://localhost:5500/api/signup", {
-        "username" : username,
-        "password" : password
+      "username": username,
+      "password": password
     })
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.setState({username : this.state.username.trim(), password : this.state.password.trim()})
-    const { username, password } = this.state;
-    console.log('Submitted values:', username, password);
-    this.login(username, password)
-    .then(response => {
-        if (response.data === false) {
-            this.setState({error : 'Invalid Credentials. Please try again' })
-        } else {
+    if (this.state.username !== '') {
+      this.setState({ username: this.state.username.trim(), password: this.state.password.trim() })
+      const { username, password } = this.state;
+      this.login(username, password)
+        .then(response => {
+          if (response.data === false) {
+            this.setState({ error: 'Invalid Credentials. Please try again' })
+          } else {
             window.sessionStorage.setItem('Logged In', true);
             window.sessionStorage.setItem('username', username)
-            this.setState({error : ''})
-            
-        }
-    })
-    .catch (error => {
-      this.setState({error : 'Server Issues!'})
-    })
-    
+            this.setState({ error: '' })
+
+          }
+        })
+        .catch(error => {
+          this.setState({ error: 'Server Issues!' })
+        })
+    } else {
+      this.setState({error : 'Enter a valid username!'})
+    }
   }
 
   createUser = () => {
-    const {username, password } = this.state;
-    this.signup(username, password)
-    .then (response => {
-        if (response.data === false) {
-            this.setState({error : 'Credentials already exist'})
-        } else {
-            this.setState({error : ''})
+    const { username, password } = this.state;
+    if (username !== '' || password !== '') {
+      this.signup(username, password)
+        .then(response => {
+          if (response.data === false) {
+            this.setState({ error: 'Credentials already exist' })
+          } else {
+            this.setState({ error: '' })
             window.sessionStorage.setItem('Logged In', true);
             window.sessionStorage.setItem('username', username)
-        }
-    })
+          }
+        })
+    } else {
+      this.setState({ error: 'Blank Fields not allowed!!' })
+    }
   }
 
   render() {
     if (window.sessionStorage.getItem('Logged In')) {
-        return <Navigate to = '/chat'/>
+      return <Navigate to='/chat' />
     }
     return (
       <div className="login-page">
@@ -83,7 +89,7 @@ class Login extends Component {
             <input
               className="input-field"
               type="text"
-              name="username" 
+              name="username"
               placeholder="Username"
               value={this.state.username}
               onChange={this.handleChange}
@@ -91,7 +97,7 @@ class Login extends Component {
             <input
               className="input-field"
               type="password"
-              name="password" 
+              name="password"
               placeholder="Password"
               value={this.state.password}
               onChange={this.handleChange}
@@ -101,11 +107,11 @@ class Login extends Component {
             </button>
           </form>
           <button className="signup-button" type="submit" onClick={this.createUser}>
-              Sign Up
-            </button>
+            Sign Up
+          </button>
           <div className="error-message-container">
             <p className='error-message'>{this.state.error}</p>
-            </div>
+          </div>
         </div>
       </div>
     );

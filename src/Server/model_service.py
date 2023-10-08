@@ -43,9 +43,9 @@ Human:{input}
 AI:
 """
 
-template_title = """What is the main topic of this conversation
+template_title = """
 "{question}"
-Stick to the conversation details given. Don't be too creative.
+What is the main topic of this conversation? Stick to the conversation details given. Don't be too creative.
 """
 
 def translate(txt, src, to):

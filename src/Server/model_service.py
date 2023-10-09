@@ -20,7 +20,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
-    "http://localhost:3000",
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
@@ -46,6 +46,7 @@ AI:
 template_title = """
 "{question}"
 What is the main topic of this conversation? Stick to the conversation details given. Don't be too creative.
+I need only the topic and it should be one liner.
 """
 
 def translate(txt, src, to):

@@ -5,7 +5,6 @@ import ChatBubble from './ChatBubble';
 import axios from "axios";
 import userAvatar from './user-avatar.png'; // Import the user avatar image
 import aiAvatar from './ai-avatar.png';
-import dotLoading from './load.gif'
 import editLogo from './edit.png';
 import delete_logo from './delete.png';
 

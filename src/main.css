@@ -113,7 +113,7 @@ body {
     position: fixed;
     bottom: 0;
     left: 1; /* Corrected 'left' property value */
-    
+    right: 10%;
     background-color: black;
     padding: 10px;
     width: 71%;
@@ -130,6 +130,7 @@ body {
     background-color: rgb(57, 57, 57);
     color: whitesmoke;
     flex-grow: 1; /* Added flex-grow property to expand input */
+    font-size: large;
 }
 
 .user-input button {

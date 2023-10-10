@@ -1,0 +1,5 @@
+gpt4all==1.0.8
+fastapi
+transformers
+pymongo
+uvicorn

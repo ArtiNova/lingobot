@@ -5,6 +5,7 @@ body {
     background-color: #121212;
     color: #ffffff;
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    position: relative;
 }
 
 /* Container for the login page */

@@ -21,6 +21,8 @@ class Main extends Component {
             editingIndex: null,
             newTitle: '',
         };
+        this.server = 'http://' + window.location.hostname + ':5500';
+        this.model = 'http://' + window.location.hostname + ':5501';
     }
 
     componentDidMount() {
@@ -31,7 +33,7 @@ class Main extends Component {
     }
 
     addNewChat = () => {
-        axios.post("http://localhost:5500/api/newChat", {
+        axios.post(this.server + "/api/newChat", {
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
@@ -52,24 +54,24 @@ class Main extends Component {
                 this.addNewChat();
             }
             this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
-            axios.post("http://localhost:5501/api/inference", {
+            axios.post(this.model + "/api/inference", {
                 "input": this.state.userInput,
                 "context": this.state.context
             })
                 .then(response => {
-                    axios.post("http://localhost:5500/api/updateContext", {
+                    axios.post(this.server + "/api/updateContext", {
                         "username": window.sessionStorage.getItem("username"),
                         "title": this.state.selectedConv,
                         "context": response.data.context
                     })
-                    axios.post("http://localhost:5500/api/updateMessages", {
+                    axios.post(this.server + "/api/updateMessages", {
                         "username": window.sessionStorage.getItem("username"),
                         "messages": [...this.state.messages, response.data.result],
                         "title": this.state.selectedConv
                     })
                     this.setState({ messages: [...this.state.messages, response.data.result], isLoading: false, context: response.data.context })
                     if (this.state.selectedConv.startsWith("New Chat")) {
-                        axios.post("http://localhost:5501/api/nameTitle", {
+                        axios.post(this.model + "/api/nameTitle", {
                             question: response.data.context
                         }).then(response => {
                             let index = this.state.previous.indexOf(this.state.selectedConv)
@@ -77,7 +79,7 @@ class Main extends Component {
                             const oldTitle = this.state.selectedConv
                             prev_temp[index] = response.data
                             this.setState({ previous: prev_temp })
-                            axios.post("http://localhost:5500/api/renameTitle", {
+                            axios.post(this.server + "/api/renameTitle", {
                                 "username": window.sessionStorage.getItem("username"),
                                 "oldTitle": oldTitle,
                                 "newTitle": response.data
@@ -93,7 +95,7 @@ class Main extends Component {
 
     loadPrevious = (event) => {
         if (this.state.editingIndex === null) {
-            axios.post("http://localhost:5500/api/loadPrevious", {
+            axios.post(this.server + "/api/loadPrevious", {
                 "username": window.sessionStorage.getItem("username"),
                 "title": event.target.innerHTML
             })
@@ -110,7 +112,7 @@ class Main extends Component {
 
     getPrevious = () => {
         const username = window.sessionStorage.getItem("username")
-        return axios.post("http://localhost:5500/api/getPrevious", {
+        return axios.post(this.server + "/api/getPrevious", {
             "username": username
         })
     }
@@ -126,7 +128,7 @@ class Main extends Component {
         const title = updatedPrevious[index]
         updatedPrevious.splice(index, 1);
         this.setState({ previous: updatedPrevious, messages: [], context: '' });
-        axios.post("http://localhost:5500/api/deleteConv", {
+        axios.post(this.server + "/api/deleteConv", {
             username: window.sessionStorage.getItem("username"),
             "title": title
         })
@@ -136,7 +138,7 @@ class Main extends Component {
         let updatePrevious = [...this.state.previous];
         updatePrevious[index] = newTitle;
         this.setState({ previous: updatePrevious });
-        axios.post("http://localhost:5500/api/renameTitle", {
+        axios.post(this.server + "/api/renameTitle", {
             "username": window.sessionStorage.getItem("username"),
             "oldTitle": oldTitle,
             "newTitle": newTitle

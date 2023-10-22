@@ -20,7 +20,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    '*'
 ]
 
 app.add_middleware(
@@ -59,7 +60,8 @@ def translate(txt, src, to):
 async def nameTitle(request : nameTitleRequest):
     print("Renaming!!")
     question = request.question
-    return model.generate(template_title.format(question = question))
+    topic = model.generate(template_title.format(question = question))
+    return topic[topic.index('"') + 1 : -1]
 
 @app.post('/api/inference')
 async def inference(request : Request):

@@ -13,6 +13,7 @@ class Login extends Component {
       password: '',
       error: ''
     };
+    this.url = 'http://' + window.location.hostname + ':5500';
   }
   handleChange = (event) => {
     const { name, value } = event.target;
@@ -20,14 +21,14 @@ class Login extends Component {
   }
 
   login = (username, password) => {
-    return axios.post("http://localhost:5500/api/login", {
+    return axios.post(this.url + "/api/login", {
       "username": username,
       "password": password
     })
   }
 
   signup = (username, password) => {
-    return axios.post("http://localhost:5500/api/signup", {
+    return axios.post(this.url + "/api/signup", {
       "username": username,
       "password": password
     })

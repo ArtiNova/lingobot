@@ -26,7 +26,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .sidebar h2 {
@@ -113,7 +113,7 @@ body {
     position: fixed;
     bottom: 0;
     left: 1; /* Corrected 'left' property value */
-    right: 10%;
+    right: 5%;
     background-color: black;
     padding: 10px;
     width: 71%;

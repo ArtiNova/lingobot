@@ -60,7 +60,10 @@ def translate(txt, src, to):
 async def nameTitle(request : nameTitleRequest):
     print("Renaming!!")
     question = request.question
-    topic = model.generate(template_title.format(question = question))
+    try:
+        topic = model.generate(template_title.format(question = question))
+    except:
+        return topic
     return topic[topic.index('"') + 1 : -1]
 
 @app.post('/api/inference')

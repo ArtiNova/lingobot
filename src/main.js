@@ -84,6 +84,9 @@ class Main extends Component {
                                 "oldTitle": oldTitle,
                                 "newTitle": response.data
                             })
+                            .catch(err => {
+                                console.log(err)
+                            })
                         })
                     }
                 })

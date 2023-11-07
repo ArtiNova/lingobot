@@ -12,7 +12,6 @@ from forConversation import conversationRequest
 from UpdateChatRequest import UpdateChatRequest, UpdateCurrentRequest
 from UpdateContext import UpdateContext
 from updateTitle import UpdateTitle
-
 MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
 client = MongoClient(MONGO_URI)
 db = client["LingoBot"]
@@ -41,7 +40,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 

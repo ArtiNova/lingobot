@@ -83,7 +83,7 @@ class Login extends Component {
     return (
       <div className="login-page">
         <div className="login-title">
-          <h1>LingoBot</h1>
+          <h1>Chat2Fluency</h1>
         </div>
         <div className="login-container">
           <form onSubmit={this.handleSubmit} method="POST" className="login-form">

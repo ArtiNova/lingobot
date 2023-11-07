@@ -53,6 +53,26 @@ class Main extends Component {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
             }
+            axios.post(this.model + "/api/correctGrammar", {
+                "text": this.state.userInput
+            })
+                .then(response => {
+                    if (response.data !== '') {
+                        let msgs = this.state.messages
+                        if (msgs.length % 2) {
+                            msgs[msgs.length - 1] += '\n________\n You should have said : ' + response.data;
+                        } else {
+                            msgs[msgs.length - 2] += '\n________\n You should have said : ' + response.data;
+                        }
+                        this.setState({ messages: msgs })
+                        axios.post(this.server + '/api/updateMessages', {
+                            "username": window.sessionStorage.getItem("username"),
+                            "messages": this.state.messages,
+                            "title": this.state.selectedConv
+                        })
+
+                    }
+                })
             this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
             axios.post(this.model + "/api/inference", {
                 "input": this.state.userInput,
@@ -84,9 +104,9 @@ class Main extends Component {
                                 "oldTitle": oldTitle,
                                 "newTitle": response.data
                             })
-                            .catch(err => {
-                                console.log(err)
-                            })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                         })
                     }
                 })
@@ -198,11 +218,11 @@ class Main extends Component {
                             onKeyDown={this.handleEnter}
                         />
                         {(this.state.isLoading === false) ?
-                        <button onClick={this.handleSend} disabled={this.state.isLoading}>
-                            ▶
-                        </button> : <div className="dot-falling-container">
-                                    <div className="stage">
-                                        <div className="dot-falling"></div>
+                            <button onClick={this.handleSend} disabled={this.state.isLoading}>
+                                ▶
+                            </button> : <div className="dot-falling-container">
+                                <div className="stage">
+                                    <div className="dot-falling"></div>
                                 </div>
                             </div>
                         }

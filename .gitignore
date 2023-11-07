@@ -38,3 +38,11 @@ src/Server/tokenizer/tokenizer_config.json
 src/Server/translation_model/config.json
 src/Server/translation_model/generation_config.json
 src/Server/translation_model/pytorch_model.bin
+src/Server/gpt4all-falcon-q4_0.gguf
+src/Server/v5/model/config.json
+src/Server/v5/model/generation_config.json
+src/Server/v5/model/model.safetensors
+src/Server/__pycache__/correctGrammar.cpython-311.pyc
+src/Server/v5/tokenizer/special_tokens_map.json
+src/Server/v5/tokenizer/tokenizer_config.json
+src/Server/v5/tokenizer/tokenizer.json

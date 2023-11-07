@@ -42,19 +42,19 @@ app.add_middleware(
 model = gpt4all.GPT4All(model_name = "gpt4all-falcon-q4_0", model_path = '.', allow_download=False)
 
 template_chat = """This is a conversation between human and AI. 
-I just want the immediate answer from the AI not an entire conversation. 
+I just want the answer from the AI not an entire conversation. 
 
-Here's the context
+Here are the previous conversations
 {context}
 
-Human:{input}
+Human: {input}
 AI:
 """
 
 template_title = """
 "{question}"
-What is the main topic of this conversation? Stick to the conversation details given. Don't be too creative.
-I need only the topic and it should be one liner.
+What is the main topic of this conversation? Use the conversation details given. Don't be too creative.
+Give only the topic and it should be one liner.
 """
 
 def translate(txt, src, to):
@@ -81,11 +81,7 @@ def correct(text):
 async def nameTitle(request : nameTitleRequest):
     print("Renaming!!")
     question = request.question
-    try:
-        topic = model.generate(template_title.format(question = question))
-    except:
-        return topic
-    return topic[topic.index('"') + 1 : -1]
+    return model.generate(template_title.format(question = question))
 
 @app.post('/api/inference')
 async def inference(request : Request):

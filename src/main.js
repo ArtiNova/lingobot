@@ -59,14 +59,10 @@ class Main extends Component {
                 .then(response => {
                     if (response.data !== '') {
                         let msgs = this.state.messages
-                        let dashes = '';
-                        for (let i = 0; i < response.data.length; i++) {
-                            dashes += ('-');
-                        }
                         if (msgs.length % 2) {
-                            msgs[msgs.length - 1] += '\n' + dashes + '\n You should have said : ' + response.data;
+                            msgs[msgs.length - 1] += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
                         } else {
-                            msgs[msgs.length - 2] += '\n' + dashes + '\n You should have said : ' + response.data;
+                            msgs[msgs.length - 2] += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
                         }
                         this.setState({ messages: msgs })
                         axios.post(this.server + '/api/updateMessages', {

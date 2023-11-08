@@ -6,7 +6,7 @@ import os
 from transformers import MBartForConditionalGeneration, MBart50TokenizerFast
 from nameTitleRequest import nameTitleRequest
 from correctGrammar import correctGrammarRequest
-from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.gleu_score import sentence_gleu
 
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
@@ -43,6 +43,7 @@ model = gpt4all.GPT4All(model_name = "gpt4all-falcon-q4_0", model_path = '.', al
 
 template_chat = """This is a conversation between human and AI. 
 I just want the answer from the AI not an entire conversation. 
+Assume that you are the AI.
 
 Here are the previous conversations
 {context}
@@ -54,7 +55,7 @@ AI:
 template_title = """
 "{question}"
 What is the main topic of this conversation? Use the conversation details given. Don't be too creative.
-Give only the topic and it should be one liner.
+Your reply must just be the topic. Make sure that the topic is a one liner.
 """
 
 def translate(txt, src, to):
@@ -71,7 +72,7 @@ def correct(text):
         generated = correction_model.generate(inputs["input_ids"], max_length=max_length, num_return_sequences=1)
         corrected_text = correction_tokenizer.decode(generated[0], skip_special_tokens=True)
         corrected_text_2 = translate(translate(hindi_text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
-        score = sentence_bleu([corrected_text_2.split()], corrected_text.split())
+        score = sentence_gleu([corrected_text_2.split()], corrected_text.split())
         if score <= 0.8:
             return corrected_text_2
         return corrected_text

@@ -184,6 +184,7 @@ class Main extends Component {
                     }}>Logout</button>
                     <h2>Previous Conversations</h2>
                     <button className='sidebar-button' onClick={this.addNewChat}><h3>+ New Chat</h3></button>
+                    <div className="sidebar-conversation-holder">
                     <ul>
                         {this.state.previous.map((title, index) => (
                             <div key={index} className="sidebar-button-container">
@@ -192,13 +193,14 @@ class Main extends Component {
                                         {title}
                                     </button>
                                 }
-                                <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button>
+                                {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : <img></img>}
                                 <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
-                                    <img className='edit-logo' alt={"delete"} src={delete_logo}></img>
+                                    {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : <img></img>}
                                 </button>
                             </div>
                         ))}
                     </ul>
+                    </div>
                 </div>
 
                 <div className="chat-interface">

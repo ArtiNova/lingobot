@@ -1,328 +1,349 @@
-/* Main.css */
 body {
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    font-size:medium;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-size: medium;
 }
 
-@media (min-width : 768px) {
-    body {
-        font-size: 16px;
-    }
+@media (min-width: 768px) {
+  body {
+      font-size: 16px;
+  }
 }
 
 .container {
-    display: flex;
-    height: 100vh;
+  display: flex;
+  height: 100vh;
 }
 
 .sidebar {
-    background-color: #333;
-    color: #fff;
-    flex: 1;
-    padding: 20px;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    overflow: auto;
+  background-color: #333;
+  color: #fff;
+  flex: 1;
+  padding: 10px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-x: hidden;
+}
+
+.sidebar-conversation-holder {
+  background-color: #333;
+  color: #fff;
+  flex: 2;
+  padding: 20px;
+  padding-right: 2cm;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-x: hidden;
+}
+
+.sidebar-conversation-holder::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar h2 {
-    margin-bottom: 10px;
-    border-top: 1px solid #fff; /* Add a horizontal line separator */
-    padding-top: 10px; /* Add some spacing above the line */
+  margin-bottom: 10px;
+  border-top: 1px solid #fff;
+  padding-top: 10px;
 }
 
 .sidebar-button {
-    background-color: #333;
-    color: #fff;
-    border : none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease-in-out;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    font-size: medium;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 5px 20px;
+  margin: 5px 0;
+  border-radius: 5px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: small;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .sidebar-button:hover {
-    background-color: #444;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  background-color: #444;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-button:focus {
-    outline: none;
+  outline: none;
 }
 
 .chat-interface {
-    flex: 2;
-    padding: 20px;
-    background-color: black;
-    overflow-y: auto;
+  flex: 2;
+  padding: 20px;
+  background-color: black;
+  overflow-y: auto;
 }
 
-/* Define the appearance of the thumb (the draggable part) of the scrollbar */
+.chat-interface::-webkit-scrollbar {
+  display: none;
+}
 .chat-interface::-webkit-scrollbar-thumb {
-    background-color: #007bff; /* Color of the thumb */
-    border: 4px solid transparent; /* Transparent border for a sleeker look */
-    border-radius: 10px; /* Rounded corners for the thumb */
-    background-clip: content-box; /* Ensure the background only applies to the thumb */
+  background-color: #007bff;
+  border: 4px solid transparent;
+  border-radius: 10px;
+  background-clip: content-box;
 }
 
-/* Define the appearance of the track (the non-draggable part) of the scrollbar */
 .chat-interface::-webkit-scrollbar-track {
-    background-color: #333; /* Color of the track */
-    border-radius: 10px; /* Rounded corners for the track */
+  background-color: #333;
+  border-radius: 10px;
 }
 
-/* Add a subtle glow effect on hover */
 .chat-interface::-webkit-scrollbar-thumb:hover {
-    background-color: #0056b3; /* Color on hover */
+  background-color: #0056b3;
 }
+
 .chat-bubble-container {
-    display: inline-block;
-    max-width: 70%;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+  display: inline-block;
+  max-width: 70%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .chat-bubble {
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 10px;
-    padding: 10px 15px;
-    margin: 10px 0;
-    max-width: 70%;
-    display: inline-block;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    width: auto;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin: 10px 0;
+  max-width: 70%;
+  display: inline-block;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  width: auto;
 }
 
-
-
 .user-input {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 1; /* Corrected 'left' property value */
-    right: 5%;
-    background-color: black;
-    padding: 10px;
-    width: 71%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 1;
+  right: 5%;
+  background-color: black;
+  padding: 10px;
+  width: 71%;
 }
 
 .user-input input {
-    width: 60%; /* Adjusted width value */
-    padding: 5px;
-    height: 30px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    outline: none;
-    background-color: rgb(57, 57, 57);
-    color: whitesmoke;
-    flex-grow: 1; /* Added flex-grow property to expand input */
-    font-size: large;
+  width: 60%;
+  padding: 5px;
+  height: 30px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  background-color: rgb(57, 57, 57);
+  color: whitesmoke;
+  flex-grow: 1;
+  font-size: large;
 }
 
 .user-input button {
-    background-color: rgb(53, 53, 53);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
-    box-shadow: 0px 5px 0px 0px #000;
-    overflow: hidden;
-    position: relative;
+  background-color: rgb(53, 53, 53);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0px 5px 0px 0px #000;
+  overflow: hidden;
+  position: relative;
 }
 
 .user-input button:hover {
-    background-color: #0056b3;
-    transform: translateY(2px);
+  background-color: #0056b3;
+  transform: translateY(2px);
 }
 
 .user-input button:active {
-    transform: translateY(4px);
+  transform: translateY(4px);
 }
 
 .avatar {
-    width: 30px; /* Adjust the width of the avatars as needed */
-    height: 30px; /* Adjust the height of the avatars as needed */
-    margin-right: 10px; /* Add spacing between avatar and message */
-    border-radius: 50%; /* Make avatars circular */
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  border-radius: 50%;
 }
-
 
 .sidebar-button-container {
-    display: flex;
-    justify-content: flex-start; /* Change to flex-start to keep buttons on the same line */
-    align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-
 .delete-button {
-    background-color: #333;
-    color: #fff;
-    border : none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    text-align: center;
-    cursor: pointer;
-    width: auto;
-    transition: background-color 0.3s ease-in-out;
-    font-size: x-large;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  text-align: center;
+  cursor: pointer;
+  width: auto;
+  transition: background-color 0.3s ease-in-out;
+  font-size: x-large;
 }
 
 .delete-button:hover {
-    color: darkred;
+  color: darkred;
 }
 
 .dot-falling-container {
-    position: relative; 
-    padding-left: 20px;
-
+  position: relative;
+  padding-left: 20px;
 }
 
 .dot-falling {
-    position: relative;
-    left: -10006px;
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #9880ff;
-    color: #9880ff;
-    box-shadow: 9999px 0 0 0 #9880ff;
-    animation: dot-falling 1s infinite linear;
-    animation-delay: 0.1s;
-  }
-  .dot-falling::before, .dot-falling::after {
-    content: "";
-    display: inline-block;
-    position: absolute;
-    top: 0;
-  }
-  .dot-falling::before {
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #9880ff;
-    color: #9880ff;
-    animation: dot-falling-before 1s infinite linear;
-    animation-delay: 0s;
-  }
-  .dot-falling::after {
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #9880ff;
-    color: #9880ff;
-    animation: dot-falling-after 1s infinite linear;
-    animation-delay: 0.2s;
-  }
-  
-  @keyframes dot-falling {
-    0% {
-      box-shadow: 9999px -15px 0 0 rgba(152, 128, 255, 0);
-    }
-    25%, 50%, 75% {
-      box-shadow: 9999px 0 0 0 #9880ff;
-    }
-    100% {
-      box-shadow: 9999px 15px 0 0 rgba(152, 128, 255, 0);
-    }
-  }
-  @keyframes dot-falling-before {
-    0% {
-      box-shadow: 9984px -15px 0 0 rgba(152, 128, 255, 0);
-    }
-    25%, 50%, 75% {
-      box-shadow: 9984px 0 0 0 #9880ff;
-    }
-    100% {
-      box-shadow: 9984px 15px 0 0 rgba(152, 128, 255, 0);
-    }
-  }
-  @keyframes dot-falling-after {
-    0% {
-      box-shadow: 10014px -15px 0 0 rgba(152, 128, 255, 0);
-    }
-    25%, 50%, 75% {
-      box-shadow: 10014px 0 0 0 #9880ff;
-    }
-    100% {
-      box-shadow: 10014px 15px 0 0 rgba(152, 128, 255, 0);
-    }
-  }
-  
-@keyframes spinner {
-    0% {
-      transform: translate3d(-50%, -50%, 0) rotate(0deg);
-    }
-    100% {
-      transform: translate3d(-50%, -50%, 0) rotate(360deg);
-    }
+  position: relative;
+  left: -10006px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  box-shadow: 9999px 0 0 0 #9880ff;
+  animation: dot-falling 1s infinite linear;
+  animation-delay: 0.1s;
 }
+
+.dot-falling::before, .dot-falling::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+
+.dot-falling::before {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-falling-before 1s infinite linear;
+  animation-delay: 0s;
+}
+
+.dot-falling::after {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-falling-after 1s infinite linear;
+  animation-delay: 0.2s;
+}
+
+@keyframes dot-falling {
+  0% {
+      box-shadow: 9999px -15px 0 0 rgba(152, 128, 255, 0);
+  }
+  25%, 50%, 75% {
+      box-shadow: 9999px 0 0 0 #9880ff;
+  }
+  100% {
+      box-shadow: 9999px 15px 0 0 rgba(152, 128, 255, 0);
+  }
+}
+
+@keyframes dot-falling-before {
+  0% {
+      box-shadow: 9984px -15px 0 0 rgba(152, 128, 255, 0);
+  }
+  25%, 50%, 75% {
+      box-shadow: 9984px 0 0 0 #9880ff;
+  }
+  100% {
+      box-shadow: 9984px 15px 0 0 rgba(152, 128, 255, 0);
+  }
+}
+
+@keyframes dot-falling-after {
+  0% {
+      box-shadow: 10014px -15px 0 0 rgba(152, 128, 255, 0);
+  }
+  25%, 50%, 75% {
+      box-shadow: 10014px 0 0 0 #9880ff;
+  }
+  100% {
+      box-shadow: 10014px 15px 0 0 rgba(152, 128, 255, 0);
+  }
+}
+
+@keyframes spinner {
+  0% {
+      transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  100% {
+      transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
 .spinner::before {
-    animation: 1.5s linear infinite spinner;
-    animation-play-state: inherit;
-    border: solid 5px #cfd0d1;
-    border-bottom-color: #1c87c9;
-    border-radius: 10%;
-    content: "";
-    height: 40px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 40px;
-    will-change: transform;
+  animation: 1.5s linear infinite spinner;
+  animation-play-state: inherit;
+  border: solid 5px #cfd0d1;
+  border-bottom-color: #1c87c9;
+  border-radius: 10%;
+  content: "";
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  width: 40px;
+  will-change: transform;
 }
 
 .edit-logo {
-    width: 23px;
-    height: 23px;
-    align-items: center;
-    perspective: 1000px; 
-    transition: transform 0.3s, background-color 0.3s; 
+  width: 23px;
+  height: 23px;
+  align-items: center;
+  perspective: 1000px;
+  transition: transform 0.3s, background-color 0.3s;
 }
 
 .edit-logo:hover {
-    transform: translateY(-5px) rotateX(10deg);
+  transform: translateY(-5px) rotateX(10deg);
 }
 
-
 .editing-input {
-    background-color: #333;
-    color: white;
+  background-color: #333;
+  color: white;
+  height: fit-content;
 }
 
 .sidebar-button-logout {
-    background-color: #333;
-    color: #fff;
-    border : none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    text-align: center;
-    cursor: pointer;
-    width: 50%;
-    transition: background-color 0.3s ease-in-out;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    font-size: medium;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  text-align: center;
+  cursor: pointer;
+  width: 50%;
+  transition: background-color 0.3s ease-in-out;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: medium;
 }
 
 .sidebar-button-logout:hover {
-    background-color: red;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  background-color: red;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }

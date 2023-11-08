@@ -22,9 +22,9 @@ class Main extends Component {
             newTitle: '',
         };
         this.server = 'http://' + window.location.hostname + ':5500';
-        this.model = 'https://a1c3-122-171-22-100.ngrok-free.app';
+        this.model =  'http://' + window.location.hostname + ':5501';
     }
-
+    
     componentDidMount() {
         this.getPrevious()
             .then(response => {

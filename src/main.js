@@ -7,6 +7,7 @@ import userAvatar from './user-avatar.png'; // Import the user avatar image
 import aiAvatar from './ai-avatar.png';
 import editLogo from './edit.png';
 import delete_logo from './delete.png';
+import mic_logo from './mic.png';
 
 class Main extends Component {
     constructor(props) {
@@ -146,6 +147,22 @@ class Main extends Component {
         }
     }
 
+    startRecognition = () => {
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'hi-IN';
+
+        recognition.onresult = (event) => {
+            const recognizedText = event.results[0][0].transcript;
+            this.setState({userInput : recognizedText});
+        }
+
+        recognition.start();
+
+        setTimeout(() => {
+            recognition.stop()
+        }, 5000);
+    }
+
     handleDeleteConversation = (index) => {
         const updatedPrevious = [...this.state.previous];
         const title = updatedPrevious[index]
@@ -219,8 +236,12 @@ class Main extends Component {
                             onChange={(e) => this.setState({ userInput: e.target.value })}
                             onKeyDown={this.handleEnter}
                         />
+                        { (this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
+                                <img className = 'mic-symbol' src={mic_logo}></img>
+                            </button> : null
+                        }
                         {(this.state.isLoading === false) ?
-                            <button onClick={this.handleSend} disabled={this.state.isLoading}>
+                            <button className='Submit-button' onClick={this.handleSend} disabled={this.state.isLoading}>
                                 ▶
                             </button> : <div className="dot-falling-container">
                                 <div className="stage">

@@ -137,6 +137,28 @@ body {
   width: 71%;
 }
 
+.user-input .mic-symbol {
+  width: 20px;
+  height: 20px;
+}
+
+.user-input .mic-button {
+  position: absolute;
+  top: 10px;
+  right: 67px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.user-input .mic-symbol:hover {
+  transform: translateY(-5px) rotateX(10deg);
+}
+
 .user-input input {
   width: 60%;
   padding: 5px;
@@ -149,9 +171,10 @@ body {
   color: whitesmoke;
   flex-grow: 1;
   font-size: large;
+  border-radius: 5cm;
 }
 
-.user-input button {
+.user-input .Submit-button {
   background-color: rgb(53, 53, 53);
   color: #fff;
   border: none;
@@ -164,12 +187,12 @@ body {
   position: relative;
 }
 
-.user-input button:hover {
+.user-input .Submit-button:hover {
   background-color: #0056b3;
   transform: translateY(2px);
 }
 
-.user-input button:active {
+.user-input .Submit-button:active {
   transform: translateY(4px);
 }
 

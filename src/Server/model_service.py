@@ -53,7 +53,9 @@ AI:
 """
 
 template_title = """
-Name this conversation between human and AI. Return only one word.
+I am giving you a conversation between a human and an AI.I want you to analyse the conversation and give only a short and apt title as the response.
+The title should sound good and should be approriate to the conversation and should be very precise.Just in case there is no appropriate context in the conversation then you have to give a general title atleast.
+Your response should contain only the title of very short length.   
 {question}
 """
 
@@ -92,9 +94,10 @@ async def inference(request : Request):
     context = request.context
     english_input = translate(input_req, "hi_IN", "en_XX")
     res = model.generate(template_chat.format(context = context, input = english_input), max_tokens=1024)
+    print(res)
     context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
     return {
-        "result" : translate(res, "en_XX", "hi_IN"),
+        "result" : translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res,
         "context" : context
     }
 

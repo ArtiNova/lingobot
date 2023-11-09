@@ -7,8 +7,8 @@ from transformers import MBartForConditionalGeneration, MBart50TokenizerFast
 from nameTitleRequest import nameTitleRequest
 from correctGrammar import correctGrammarRequest
 from nltk.translate.gleu_score import sentence_gleu
-
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+import string
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
 correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
@@ -53,9 +53,8 @@ AI:
 """
 
 template_title = """
-"{question}"
-What is the main topic of this conversation? Use the conversation details given. Don't be too creative.
-Your reply must just be the topic. Make sure that the topic is a one liner.
+Name this conversation between human and AI. Return only one word.
+{question}
 """
 
 def translate(txt, src, to):
@@ -72,6 +71,8 @@ def correct(text):
         generated = correction_model.generate(inputs["input_ids"], max_length=max_length, num_return_sequences=1)
         corrected_text = correction_tokenizer.decode(generated[0], skip_special_tokens=True)
         corrected_text_2 = translate(translate(hindi_text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
+        if ''.join(list(filter(lambda x: x not in string.punctuation, corrected_text_2))).strip() == ''.join(list(filter(lambda x : x not in string.punctuation, text))).strip():
+            return ''
         score = sentence_gleu([corrected_text_2.split()], corrected_text.split())
         if score <= 0.8:
             return corrected_text_2

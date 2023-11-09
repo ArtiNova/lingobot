@@ -237,7 +237,7 @@ class Main extends Component {
                             onKeyDown={this.handleEnter}
                         />
                         { (this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
-                                <img className = 'mic-symbol' src={mic_logo}></img>
+                                <img alt="mic" className = 'mic-symbol' src={mic_logo}></img>
                             </button> : null
                         }
                         {(this.state.isLoading === false) ?

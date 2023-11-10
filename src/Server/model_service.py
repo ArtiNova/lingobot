@@ -53,9 +53,7 @@ AI:
 """
 
 template_title = """
-I am giving you a conversation between a human and an AI.I want you to analyse the conversation and give only a short and apt title as the response.
-The title should sound good and should be approriate to the conversation and should be very precise.Just in case there is no appropriate context in the conversation then you have to give a general title atleast.
-Your response should contain only the title of very short length.   
+I am giving you a conversation between a human and an AI. Analyze carefully and give me a short sentence that summarizes the conversation.
 {question}
 """
 

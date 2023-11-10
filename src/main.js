@@ -38,21 +38,14 @@ class Main extends Component {
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
-            .then(response => {
-                if (response.data) {
-                    this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: '' })
-
-                }
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: '' })
     }
 
     handleSend = (event) => {
         if (this.state.userInput.trim() !== '') {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
+                this.setState({messages : [this.state.userInput]});
             }
             axios.post(this.model + "/api/correctGrammar", {
                 "text": this.state.userInput
@@ -112,6 +105,7 @@ class Main extends Component {
                     }
                 })
                 .catch(error => {
+                    this.setState({isLoading : false});
                     alert(error)
                 })
         }

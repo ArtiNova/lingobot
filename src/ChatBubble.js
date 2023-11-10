@@ -4,6 +4,7 @@ import speak_logo from './speaking.png';
 
 function text_to_speach(message) {
     var utterance = new SpeechSynthesisUtterance();
+    message = message.replace(/--+/g, '');
     utterance.text = message;
     utterance.lang = 'hi-IN';
     utterance.voice = speechSynthesis.getVoices()[0];

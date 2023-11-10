@@ -6,8 +6,8 @@ function text_to_speach(message) {
     var utterance = new SpeechSynthesisUtterance();
     message = message.replace(/--+/g, '');
     utterance.text = message;
+    utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === 'hi-IN');
     utterance.lang = 'hi-IN';
-    utterance.voice = speechSynthesis.getVoices()[0];
 
     speechSynthesis.speak(utterance);
 }

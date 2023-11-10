@@ -58,3 +58,18 @@
     clear: both; /* Clear any previous floats */
 }
 
+.speak-button {
+    background-color: transparent;
+    border: none;
+}
+
+.speak-button:hover {
+    transform: translateY(-5px) rotateX(10deg);
+    cursor: pointer;
+}
+
+.chat-bubble .speak-logo {
+    width: 24px;
+    height: 24px;
+}
+

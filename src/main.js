@@ -210,9 +210,9 @@ class Main extends Component {
                                         {title}
                                     </button>
                                 }
-                                {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : <img></img>}
+                                {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : <img alt="empty"></img>}
                                 <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
-                                    {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : <img></img>}
+                                    {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : <img alt = "empty"></img>}
                                 </button>
                             </div>
                         ))}

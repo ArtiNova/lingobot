@@ -148,6 +148,7 @@ class Main extends Component {
         recognition.onresult = (event) => {
             const recognizedText = event.results[0][0].transcript;
             this.setState({userInput : recognizedText});
+            document.getElementById("input").focus({ focusVisible: true });
         }
 
         recognition.start();
@@ -229,6 +230,7 @@ class Main extends Component {
                             value={this.state.userInput}
                             onChange={(e) => this.setState({ userInput: e.target.value })}
                             onKeyDown={this.handleEnter}
+                            id='input'
                         />
                         { (this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
                                 <img alt="mic" className = 'mic-symbol' src={mic_logo}></img>

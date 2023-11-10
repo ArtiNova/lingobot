@@ -42,7 +42,7 @@ app.add_middleware(
 model = gpt4all.GPT4All(model_name = "ggml-model-gpt4all-falcon-q4_0", model_path = '.')
 
 template_chat = """This is a conversation between human and AI. 
-I just want the answer from the AI not an entire conversation. 
+I just want the immediate answer from the AI not an entire conversation. 
 Assume that you are the AI.
 
 Here are the previous conversations
@@ -53,7 +53,7 @@ AI:
 """
 
 template_title = """
-I am giving you a conversation between a human and an AI. Analyze carefully and give me a short sentence that summarizes the conversation.
+I am giving you a conversation between a human and an AI. Analyze carefully and give me a short sentence that summarizes the conversation. Don't add any pre-text in your reply. I just want an immediate reply.
 {question}
 """
 

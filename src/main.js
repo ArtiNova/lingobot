@@ -167,7 +167,7 @@ class Main extends Component {
         const updatedPrevious = [...this.state.previous];
         const title = updatedPrevious[index]
         updatedPrevious.splice(index, 1);
-        this.setState({ previous: updatedPrevious, messages: [], context: '' });
+        this.setState({ previous: updatedPrevious, messages: [], context: '', selectedConv : '' });
         axios.post(this.server + "/api/deleteConv", {
             username: window.sessionStorage.getItem("username"),
             "title": title

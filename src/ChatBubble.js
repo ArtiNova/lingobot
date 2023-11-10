@@ -3,12 +3,12 @@ import './ChatBubble.css'; // Import the CSS file for ChatBubble
 import speak_logo from './speaking.png';
 
 function text_to_speach(message) {
-    var utterance = new SpeechSynthesisUtterance();
-    message = message.replace(/--+/g, '');
-    utterance.text = message;
+    console.log("Speak!")
+    var utterance = new SpeechSynthesisUtterance(message.replace(/--+/g, ''));
     utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === 'hi-IN');
     utterance.lang = 'hi-IN';
 
+    speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
 }
 

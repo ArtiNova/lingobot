@@ -46,3 +46,5 @@ src/Server/__pycache__/correctGrammar.cpython-311.pyc
 src/Server/v5/tokenizer/special_tokens_map.json
 src/Server/v5/tokenizer/tokenizer_config.json
 src/Server/v5/tokenizer/tokenizer.json
+*.pyc
+build.zip

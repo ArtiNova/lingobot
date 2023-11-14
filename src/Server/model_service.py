@@ -53,7 +53,7 @@ AI:
 """
 
 template_title = """
-I am giving you a conversation between a human and an AI. Analyze carefully and give me a short sentence that summarizes the conversation. Don't add any pre-text in your reply. I just want an immediate reply.
+I am giving you a conversation between a human and an AI,  Don't add any pre-text in your reply. Analyze carefully and give me a short sentence that summarizes the conversation. I just want an immediate reply.
 {question}
 """
 

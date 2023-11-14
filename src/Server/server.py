@@ -12,6 +12,9 @@ from forConversation import conversationRequest
 from UpdateChatRequest import UpdateChatRequest, UpdateCurrentRequest
 from UpdateContext import UpdateContext
 from updateTitle import UpdateTitle
+from AudioRequestResponse import AudioRequest
+from gtts import gTTS
+from fastapi.responses import FileResponse
 MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
 client = MongoClient(MONGO_URI)
 db = client["LingoBot"]
@@ -146,6 +149,22 @@ async def updateContext(request : UpdateContext):
             "context" : context
         }
     })
+
+@app.post('/api/audio')
+async def createAudio(request : AudioRequest):
+    tts = gTTS(text=request.message, lang='hi', slow=False)
+    tts.save('output.mp3')
+    return True
+
+@app.get('/api/playSound')
+async def playSound():
+    return FileResponse("output.mp3")
+
+@app.post('/api/deleteAudio')
+async def remove():
+    os.remove("output.mp3")
+    return True
+
 
 
 if __name__ == '__main__':

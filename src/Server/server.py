@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import gpt4all
 import os
-from transformers import MBartForConditionalGeneration, MBart50TokenizerFast
 from ReqResBody import Response, Request
 from loginReqRes import LoginRequest
 from pymongo import MongoClient

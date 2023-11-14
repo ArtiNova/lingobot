@@ -5,3 +5,4 @@ sentencepiece
 accelerate
 pymongo
 uvicorn
+gTTS

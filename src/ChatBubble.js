@@ -19,7 +19,7 @@ function text_to_speach(message, avatar) {
     .then(response => {
         if (response.data === true) {
             var audio = new Audio('http://' + window.location.hostname + ':5500/api/playSound');
-            audio.playbackRate = 1.5;
+            audio.playbackRate = 1.2;
             audio.play().then(()=>{
                 axios.post('http://' + window.location.hostname + ':5500/api/deleteAudio')
             })

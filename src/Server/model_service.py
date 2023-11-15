@@ -9,9 +9,16 @@ from correctGrammar import correctGrammarRequest
 from nltk.translate.gleu_score import sentence_gleu
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import string
+from sentence_transformers import SentenceTransformer, util
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
 correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
+
+if not os.path.exists('./similarity/'):
+    semantic_sim_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+    semantic_sim_model.save('./similarity/')
+
+semantic_sim_model = SentenceTransformer('./similarity/')
 
 if not os.path.exists('./translation_model'):
     translation_model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50-many-to-many-mmt")
@@ -57,6 +64,9 @@ I am giving you a conversation between a human and an AI,  Don't add any pre-tex
 {question}
 """
 
+def preprocess_result(text):
+    return ''.join(list(filter(lambda x: x not in string.punctuation, text))).strip()
+
 def translate(txt, src, to):
     tokenizer.src_lang = src
     encoded_en = tokenizer(txt, return_tensors="pt")
@@ -67,16 +77,16 @@ def correct(text):
     hindi_text = translate(text, "hi_IN", "en_XX")
     if hindi_text != text:
         inputs = correction_tokenizer(text, return_tensors="pt")
-        max_length = 200  # Adjust as needed
+        max_length = 200  
         generated = correction_model.generate(inputs["input_ids"], max_length=max_length, num_return_sequences=1)
         corrected_text = correction_tokenizer.decode(generated[0], skip_special_tokens=True)
         corrected_text_2 = translate(translate(hindi_text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
-        if ''.join(list(filter(lambda x: x not in string.punctuation, corrected_text_2))).strip() == ''.join(list(filter(lambda x : x not in string.punctuation, text))).strip():
+        if preprocess_result(text) == preprocess_result(corrected_text_2):
             return ''
-        score = sentence_gleu([corrected_text_2.split()], corrected_text.split())
-        if score <= 0.8:
+        score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()
+        if score <= 0.9:
             return corrected_text_2
-        return corrected_text
+        return ''
     return ''
 
 @app.post('/api/nameTitle')

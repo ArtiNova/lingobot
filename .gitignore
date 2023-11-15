@@ -48,3 +48,14 @@ src/Server/v5/tokenizer/tokenizer_config.json
 src/Server/v5/tokenizer/tokenizer.json
 *.pyc
 build.zip
+src/Server/similarity/1_Pooling/config.json
+src/Server/similarity/config.json
+src/Server/similarity/config_sentence_transformers.json
+src/Server/similarity/model.safetensors
+src/Server/similarity/modules.json
+src/Server/similarity/vocab.txt
+src/Server/similarity/tokenizer_config.json
+src/Server/similarity/tokenizer.json
+src/Server/similarity/special_tokens_map.json
+src/Server/similarity/sentence_bert_config.json
+src/Server/similarity/README.md

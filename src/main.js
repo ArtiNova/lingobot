@@ -67,6 +67,7 @@ class Main extends Component {
 
                     }
                 })
+                .catch(err => {})
             this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
             axios.post(this.model + "/api/inference", {
                 "input": this.state.userInput,
@@ -98,9 +99,11 @@ class Main extends Component {
                                 "oldTitle": oldTitle,
                                 "newTitle": response.data
                             })
-                                .catch(err => {
-                                    console.log(err)
-                                })
+                            .catch(err => {
+                            })
+                        })
+                        .catch(err => {
+                            
                         })
                     }
                 })
@@ -201,7 +204,7 @@ class Main extends Component {
                         {this.state.previous.map((title, index) => (
                             <div key={index} className="sidebar-button-container">
                                 {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value={this.state.newTitle} onChange={(event) => { this.setState({ newTitle: event.target.value }) }} onKeyDown={(event) => { if (event.key === 'Enter') { this.rename(title, event.target.value, index) } }}></input> :
-                                    <button id={index} className='sidebar-button' onClick={this.loadPrevious}>
+                                    <button id={index} className='sidebar-button' onClick={this.loadPrevious} disabled = {this.state.isLoading}>
                                         {title}
                                     </button>
                                 }

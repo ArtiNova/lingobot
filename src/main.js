@@ -225,6 +225,7 @@ class Main extends Component {
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (
                             <div key={index} className={index % 2 === 0 ? 'user-message' : 'ai-message'}>
+                                {console.log(message)}
                                 <ChatBubble message={message} avatar={index % 2 === 0 ? userAvatar : aiAvatar} />
                             </div>
                         ))}

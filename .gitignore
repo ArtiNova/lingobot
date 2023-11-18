@@ -59,3 +59,5 @@ src/Server/similarity/tokenizer.json
 src/Server/similarity/special_tokens_map.json
 src/Server/similarity/sentence_bert_config.json
 src/Server/similarity/README.md
+src/Server/config.json
+src/Server/config.json

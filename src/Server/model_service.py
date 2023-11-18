@@ -17,8 +17,8 @@ correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
 if not os.path.exists('./similarity/'):
     semantic_sim_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
     semantic_sim_model.save('./similarity/')
-
-semantic_sim_model = SentenceTransformer('./similarity/')
+else:
+    semantic_sim_model = SentenceTransformer('./similarity/')
 
 if not os.path.exists('./translation_model'):
     translation_model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50-many-to-many-mmt")
@@ -60,7 +60,7 @@ AI:
 """
 
 template_title = """
-I am giving you a conversation between a human and an AI,  Don't add any pre-text in your reply. Analyze carefully and give me a short sentence that summarizes the conversation. I just want an immediate reply.
+Analyze this conversation and name the conversation with a creative single word title.
 {question}
 """
 
@@ -84,7 +84,7 @@ def correct(text):
         if preprocess_result(text) == preprocess_result(corrected_text_2):
             return ''
         score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()
-        if score <= 0.9:
+        if score <= 0.7:
             return corrected_text_2
         return ''
     return ''

@@ -8,6 +8,8 @@ import aiAvatar from './ai-avatar.png';
 import editLogo from './edit.png';
 import delete_logo from './delete.png';
 import mic_logo from './mic.png';
+import close from './angle-circle-right.png';
+import open from './angle-circle-left.png';
 
 class Main extends Component {
     constructor(props) {
@@ -21,6 +23,7 @@ class Main extends Component {
             selectedConv: '',
             editingIndex: null,
             newTitle: '',
+            sidebar_collapsed : false,
         };
         this.server = 'http://' + window.location.hostname + ':5500';
         this.model =  'http://' + window.location.hostname + ':5501';
@@ -191,7 +194,7 @@ class Main extends Component {
 
         return (
             <div className="container">
-                <div className="sidebar">
+                {(this.state.sidebar_collapsed === false) ? <div className="sidebar">
                     <h1>Welcome {window.sessionStorage.getItem("username")}!</h1>
                     <button className='sidebar-button-logout' onClick={() => {
                         window.sessionStorage.clear();
@@ -216,8 +219,8 @@ class Main extends Component {
                         ))}
                     </ul>
                     </div>
-                </div>
-
+                </div> : null}
+                <button className='collapse-button' onClick={() => this.setState({sidebar_collapsed : !this.state.sidebar_collapsed})}><img className='direction-img' src = {(this.state.sidebar_collapsed === false) ? open : close}></img></button>
                 <div className="chat-interface">
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (

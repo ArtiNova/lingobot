@@ -374,6 +374,12 @@ body {
   background: transparent;
   border: none;
   cursor: pointer;
+  transition: 0.3s ease-out;
+}
+
+.collapse-button:hover {
+  background-color: #565656;
+  transition: 0.3s ease-in;
 }
 
 .collapse-button :hover {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './ChatBubble.css'; // Import the CSS file for ChatBubble
+import './ChatBubble.css';
 import speak_logo from './speaking.png';
 import user from './user-avatar.png';
 import axios from 'axios';
@@ -92,7 +92,7 @@ class ChatBubble extends Component {
                 {this.props.avatar && <img src={this.props.avatar} alt="Avatar" className="avatar" />}
                 {this.props.message}
                 {(this.state.isPlaying === false) ? <button onClick={this.text_to_speach} className='speak-button'><img src={speak_logo} alt={'speak'} className='speak-logo'></img></button> : 
-                <button onClick={this.stopSpeach} className='speak-button'><img src={stop_speak} alt={'speak'} className='speak-logo'></img></button>
+                <button onClick={this.stopSpeach} alt='stop_speak' className='speak-button'><img src={stop_speak} alt={'speak'} className='speak-logo'></img></button>
                 }
             </div>
         );

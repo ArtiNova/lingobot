@@ -74,13 +74,12 @@ def translate(txt, src, to):
     return tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
 
 def correct(text):
-    hindi_text = translate(text, "hi_IN", "en_XX")
-    if hindi_text != text:
+    if not any(map(lambda x: (ord(x) >= 65 and ord(x) <= 122) or ord(x) == 32, text)):
         inputs = correction_tokenizer(text, return_tensors="pt")
         max_length = 200  
         generated = correction_model.generate(inputs["input_ids"], max_length=max_length, num_return_sequences=1)
         corrected_text = correction_tokenizer.decode(generated[0], skip_special_tokens=True)
-        corrected_text_2 = translate(translate(hindi_text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
+        corrected_text_2 = translate(translate(text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
         if preprocess_result(text) == preprocess_result(corrected_text_2):
             return ''
         score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()

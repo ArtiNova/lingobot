@@ -220,12 +220,11 @@ class Main extends Component {
                     </ul>
                     </div>
                 </div> : null}
-                <button className='collapse-button' onClick={() => this.setState({sidebar_collapsed : !this.state.sidebar_collapsed})}><img className='direction-img' src = {(this.state.sidebar_collapsed === false) ? open : close}></img></button>
+                <button className='collapse-button' onClick={() => this.setState({sidebar_collapsed : !this.state.sidebar_collapsed})}><img className='direction-img' alt='arrow' src = {(this.state.sidebar_collapsed === false) ? open : close}></img></button>
                 <div className="chat-interface">
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (
                             <div key={index} className={index % 2 === 0 ? 'user-message' : 'ai-message'}>
-                                {console.log(message)}
                                 <ChatBubble message={message} avatar={index % 2 === 0 ? userAvatar : aiAvatar} />
                             </div>
                         ))}

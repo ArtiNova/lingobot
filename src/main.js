@@ -17,7 +17,7 @@ class Main extends Component {
         this.state = {
             messages: [],
             userInput: '',
-            context: '',
+            context:  [{'role': 'system', 'content': ''}],
             isLoading: false,
             previous: [],
             selectedConv: '',
@@ -41,10 +41,11 @@ class Main extends Component {
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
-        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: '' })
+        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{'role': 'system', 'content': ''}] })
     }
 
     handleSend = (event) => {
+        console.log(this.state);
         if (this.state.userInput.trim() !== '') {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
@@ -84,31 +85,35 @@ class Main extends Component {
                     })
                     axios.post(this.server + "/api/updateMessages", {
                         "username": window.sessionStorage.getItem("username"),
-                        "messages": [...this.state.messages, response.data.result],
+                        "messages": [...this.state.messages, response.data.result.trim()],
                         "title": this.state.selectedConv
                     })
-                    this.setState({ messages: [...this.state.messages, response.data.result], isLoading: false, context: response.data.context })
-                    if (this.state.selectedConv.startsWith("New Chat")) {
-                        axios.post(this.model + "/api/nameTitle", {
-                            question: response.data.context
-                        }).then(response => {
-                            let index = this.state.previous.indexOf(this.state.selectedConv)
-                            let prev_temp = this.state.previous
-                            const oldTitle = this.state.selectedConv
-                            prev_temp[index] = response.data
-                            this.setState({ previous: prev_temp })
-                            axios.post(this.server + "/api/renameTitle", {
-                                "username": window.sessionStorage.getItem("username"),
-                                "oldTitle": oldTitle,
-                                "newTitle": response.data
-                            })
-                            .catch(err => {
-                            })
-                        })
-                        .catch(err => {
-                            
-                        })
-                    }
+                    .then(re => {
+                        if (re.data === true) {
+                            if (this.state.selectedConv.startsWith("New Chat")) {
+                                axios.post(this.model + "/api/nameTitle", {
+                                    question: response.data.context
+                                }).then(response => {
+                                    let index = this.state.previous.indexOf(this.state.selectedConv)
+                                    let prev_temp = this.state.previous
+                                    const oldTitle = this.state.selectedConv
+                                    prev_temp[index] = response.data
+                                    this.setState({ previous: prev_temp })
+                                    axios.post(this.server + "/api/renameTitle", {
+                                        "username": window.sessionStorage.getItem("username"),
+                                        "oldTitle": oldTitle,
+                                        "newTitle": response.data
+                                    })
+                                    .catch(err => {
+                                    })
+                                })
+                                .catch(err => {
+                                    
+                                })
+                            }
+                        }
+                    })
+                    this.setState({ messages: [...this.state.messages, response.data.result.trim()], isLoading: false, context: response.data.context })
                 })
                 .catch(error => {
                     this.setState({isLoading : false});

@@ -112,7 +112,7 @@ async def getPrevious(request : conversationRequest):
 @app.post('/api/newChat')
 async def updateChat(request : UpdateChatRequest):
     username, title = request.username, request.title
-    chat_collection.insert_one({"username" : username, "title" : title, "messages" : list(), "context" : ''})
+    chat_collection.insert_one({"username" : username, "title" : title, "messages" : list(), "context" :  [{'role': 'system', 'content': ''}]})
     return True
 
 @app.post('/api/updateMessages')

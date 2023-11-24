@@ -61,3 +61,4 @@ src/Server/similarity/sentence_bert_config.json
 src/Server/similarity/README.md
 src/Server/config.json
 src/Server/config.json
+src/Server/mistral-7b-openorca.Q4_0.gguf

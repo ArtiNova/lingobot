@@ -48,7 +48,7 @@ app.add_middleware(
 
 model = gpt4all.GPT4All(model_name = "ggml-model-gpt4all-falcon-q4_0", model_path = '.')
 
-template_chat = """This is a conversation between human and AI. 
+template_chat = """This is a chat between human and AI. 
 I just want the immediate answer from the AI not an entire conversation. 
 Assume that you are the AI.
 
@@ -91,8 +91,12 @@ def correct(text):
 @app.post('/api/nameTitle')
 async def nameTitle(request : nameTitleRequest):
     print("Renaming!!")
-    question = request.question
-    return model.generate(template_title.format(question = question))
+    context = ""
+    for i in request.question[1:]:
+        context += (i['role'] + ' : ' + i['content'] + '\n')
+    with model.chat_session():
+        response = model.generate(f"This is a chat between human and AI assistant can you analyze the chat and give a single word topic. Just reply the topic. Here's the conversation : {context}")
+    return response.strip()
 
 @app.post('/api/inference')
 async def inference(request : Request):
@@ -100,11 +104,14 @@ async def inference(request : Request):
     input_req = request.input
     context = request.context
     english_input = translate(input_req, "hi_IN", "en_XX")
-    res = model.generate(template_chat.format(context = context, input = english_input), max_tokens=1024)
+    with model.chat_session():
+        model.current_chat_session = context
+        res = model.generate(english_input, max_tokens=1024)
+        context = model.current_chat_session
     print(res)
-    context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
+    #context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
     return {
-        "result" : translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res,
+        "result" : (translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
         "context" : context
     }
 

@@ -62,3 +62,5 @@ src/Server/similarity/README.md
 src/Server/config.json
 src/Server/config.json
 src/Server/mistral-7b-openorca.Q4_0.gguf
+Training Notebooks/try_to_fix_gec.ipynb
+src/Server/config.json

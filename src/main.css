@@ -14,6 +14,7 @@ body {
 .container {
   display: flex;
   height: 100vh;
+  border-radius: 2cm;
 }
 
 .sidebar {
@@ -82,6 +83,8 @@ body {
   padding: 20px;
   background-color: black;
   overflow-y: auto;
+  max-height: calc(100vh - 100px); /* Adjust the value as needed */
+  border-radius: 1cm;
 }
 
 .chat-interface::-webkit-scrollbar {
@@ -130,10 +133,10 @@ body {
   position: fixed;
   bottom: 0;
   left: 1;
-  right: 5%;
-  background-color: black;
+  right: 1%;
+  background-color: rgba(18, 18, 18);
   padding: 10px;
-  width: 71%;
+  width: 78%;
 }
 
 .user-input .mic-symbol {
@@ -161,12 +164,12 @@ body {
 .user-input input {
   width: 60%;
   padding: 5px;
-  height: 30px;
+  height: 28px;
   margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   outline: none;
-  background-color: rgb(57, 57, 57);
+  background-color: rgba(66, 66, 66);
   color: whitesmoke;
   flex-grow: 1;
   font-size: large;

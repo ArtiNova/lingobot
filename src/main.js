@@ -17,18 +17,18 @@ class Main extends Component {
         this.state = {
             messages: [],
             userInput: '',
-            context:  [{'role': 'system', 'content': ''}],
+            context: [{ 'role': 'system', 'content': '' }],
             isLoading: false,
             previous: [],
             selectedConv: '',
             editingIndex: null,
             newTitle: '',
-            sidebar_collapsed : false,
+            sidebar_collapsed: false,
         };
-        this.server = 'http://' + window.location.hostname + ':5500';
-        this.model =  'http://' + window.location.hostname + ':5501';
+        this.server = 'https://' + window.location.hostname + ':5500';
+        this.model = 'https://' + window.location.hostname + ':5501';
     }
-    
+
     componentDidMount() {
         this.getPrevious()
             .then(response => {
@@ -41,15 +41,15 @@ class Main extends Component {
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
-        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{'role': 'system', 'content': ''}] })
+        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{ 'role': 'system', 'content': '' }] })
     }
 
     handleSend = (event) => {
-        console.log(this.state);
+        let input = this.state.userInput;
         if (this.state.userInput.trim() !== '') {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
-                this.setState({messages : [this.state.userInput]});
+                this.setState({ messages: [this.state.userInput] });
             }
             axios.post(this.model + "/api/correctGrammar", {
                 "text": this.state.userInput
@@ -70,55 +70,51 @@ class Main extends Component {
                         })
 
                     }
+                    axios.post(this.model + "/api/inference", {
+                        "input": (response.data === '') ? input : response.data,
+                        "context": this.state.context
+                    })
+                        .then(response => {
+                            axios.post(this.server + "/api/updateContext", {
+                                "username": window.sessionStorage.getItem("username"),
+                                "title": this.state.selectedConv,
+                                "context": response.data.context
+                            })
+                            axios.post(this.server + "/api/updateMessages", {
+                                "username": window.sessionStorage.getItem("username"),
+                                "messages": [...this.state.messages, response.data.result.trim()],
+                                "title": this.state.selectedConv
+                            })
+                                .then(re => {
+                                    if (re.data === true) {
+                                        if (this.state.selectedConv.startsWith("New Chat")) {
+                                            let index = this.state.previous.indexOf(this.state.selectedConv);
+                                            const oldTitle = this.state.selectedConv;
+                                            let prev_temp = this.state.previous;
+                                            prev_temp[index] = input
+                                            this.setState({previoud : prev_temp});
+                                            axios.post(this.server + '/api/renameTitle', {
+                                                "username": window.sessionStorage.getItem("username"),
+                                                "oldTitle": oldTitle,
+                                                "newTitle": prev_temp[index]
+                                            })
+                                                .then(res => {
+                                                    if (res.data === true) {
+                                                        this.setState({ previous: prev_temp});
+                                                    }
+                                                })
+                                        }
+                                    }
+                                })
+                            this.setState({ messages: [...this.state.messages, response.data.result.trim()], isLoading: false, context: response.data.context })
+                        })
+                        .catch(error => {
+                            this.setState({ isLoading: false });
+                            alert(error)
+                        })
                 })
-                .catch(err => {})
+                .catch(err => { })
             this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
-            axios.post(this.model + "/api/inference", {
-                "input": this.state.userInput,
-                "context": this.state.context
-            })
-                .then(response => {
-                    axios.post(this.server + "/api/updateContext", {
-                        "username": window.sessionStorage.getItem("username"),
-                        "title": this.state.selectedConv,
-                        "context": response.data.context
-                    })
-                    axios.post(this.server + "/api/updateMessages", {
-                        "username": window.sessionStorage.getItem("username"),
-                        "messages": [...this.state.messages, response.data.result.trim()],
-                        "title": this.state.selectedConv
-                    })
-                    .then(re => {
-                        if (re.data === true) {
-                            if (this.state.selectedConv.startsWith("New Chat")) {
-                                axios.post(this.model + "/api/nameTitle", {
-                                    question: response.data.context
-                                }).then(response => {
-                                    let index = this.state.previous.indexOf(this.state.selectedConv)
-                                    let prev_temp = this.state.previous
-                                    const oldTitle = this.state.selectedConv
-                                    prev_temp[index] = response.data
-                                    this.setState({ previous: prev_temp })
-                                    axios.post(this.server + "/api/renameTitle", {
-                                        "username": window.sessionStorage.getItem("username"),
-                                        "oldTitle": oldTitle,
-                                        "newTitle": response.data
-                                    })
-                                    .catch(err => {
-                                    })
-                                })
-                                .catch(err => {
-                                    
-                                })
-                            }
-                        }
-                    })
-                    this.setState({ messages: [...this.state.messages, response.data.result.trim()], isLoading: false, context: response.data.context })
-                })
-                .catch(error => {
-                    this.setState({isLoading : false});
-                    alert(error)
-                })
         }
     }
 
@@ -158,7 +154,7 @@ class Main extends Component {
 
         recognition.onresult = (event) => {
             const recognizedText = event.results[0][0].transcript;
-            this.setState({userInput : recognizedText});
+            this.setState({ userInput: recognizedText });
             document.getElementById("input").focus({ focusVisible: true });
         }
 
@@ -173,7 +169,7 @@ class Main extends Component {
         const updatedPrevious = [...this.state.previous];
         const title = updatedPrevious[index]
         updatedPrevious.splice(index, 1);
-        this.setState({ previous: updatedPrevious, messages: [], context: '', selectedConv : '' });
+        this.setState({ previous: updatedPrevious, messages: [], context: '', selectedConv: '' });
         axios.post(this.server + "/api/deleteConv", {
             username: window.sessionStorage.getItem("username"),
             "title": title
@@ -208,24 +204,24 @@ class Main extends Component {
                     <h2>Previous Conversations</h2>
                     <button className='sidebar-button' onClick={this.addNewChat}><h3>+ New Chat</h3></button>
                     <div className="sidebar-conversation-holder">
-                    <ul>
-                        {this.state.previous.map((title, index) => (
-                            <div key={index} className="sidebar-button-container">
-                                {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value={this.state.newTitle} onChange={(event) => { this.setState({ newTitle: event.target.value }) }} onKeyDown={(event) => { if (event.key === 'Enter') { this.rename(title, event.target.value, index) } }}></input> :
-                                    <button id={index} className='sidebar-button' onClick={this.loadPrevious} disabled = {this.state.isLoading}>
-                                        {title}
+                        <ul>
+                            {this.state.previous.map((title, index) => (
+                                <div key={index} className="sidebar-button-container">
+                                    {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value={this.state.newTitle} onChange={(event) => { this.setState({ newTitle: event.target.value }) }} onKeyDown={(event) => { if (event.key === 'Enter') { this.rename(title, event.target.value, index) } }}></input> :
+                                        <button id={index} className='sidebar-button' onClick={this.loadPrevious} disabled={this.state.isLoading}>
+                                            {title}
+                                        </button>
+                                    }
+                                    {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : null}
+                                    <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
+                                        {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : null}
                                     </button>
-                                }
-                                {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : null}
-                                <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
-                                    {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : null}
-                                </button>
-                            </div>
-                        ))}
-                    </ul>
+                                </div>
+                            ))}
+                        </ul>
                     </div>
                 </div> : null}
-                <button className='collapse-button' onClick={() => this.setState({sidebar_collapsed : !this.state.sidebar_collapsed})}><img className='direction-img' alt='arrow' src = {(this.state.sidebar_collapsed === false) ? open : close}></img></button>
+                <button className='collapse-button' onClick={() => this.setState({ sidebar_collapsed: !this.state.sidebar_collapsed })}><img className='direction-img' alt='arrow' src={(this.state.sidebar_collapsed === false) ? open : close}></img></button>
                 <div className="chat-interface">
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (
@@ -243,9 +239,9 @@ class Main extends Component {
                             onKeyDown={this.handleEnter}
                             id='input'
                         />
-                        { (this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
-                                <img alt="mic" className = 'mic-symbol' src={mic_logo}></img>
-                            </button> : null
+                        {(this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
+                            <img alt="mic" className='mic-symbol' src={mic_logo}></img>
+                        </button> : null
                         }
                         {(this.state.isLoading === false) ?
                             <button className='Submit-button' onClick={this.handleSend} disabled={this.state.isLoading}>

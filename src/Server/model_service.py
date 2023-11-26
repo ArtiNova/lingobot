@@ -83,7 +83,7 @@ def correct(text):
         if preprocess_result(text) == preprocess_result(corrected_text_2):
             return ''
         score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()
-        if score <= 0.7:
+        if score >= 0.9:
             return corrected_text_2
         return ''
     return ''

@@ -100,7 +100,7 @@ class Main extends Component {
                                             })
                                                 .then(res => {
                                                     if (res.data === true) {
-                                                        this.setState({ previous: prev_temp});
+                                                        this.setState({ previous: prev_temp, selectedConv : prev_temp[index]});
                                                     }
                                                 })
                                         }

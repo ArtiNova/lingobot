@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class PreviousRequest(BaseModel):
+class PreviousRequest(AllReq):
     username : str
     title : str
 
-class PreviousResponse(BaseModel):
+class PreviousResponse(AllReq):
     messages : list

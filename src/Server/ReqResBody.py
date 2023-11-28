@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class Request(BaseModel):
+class Request(AllReq):
     input : str
     context : list[dict]
 
-class Response(BaseModel):
+class Response(AllReq):
     result_english : str
     result_hindi : str

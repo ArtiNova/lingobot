@@ -58,18 +58,18 @@ class ChatBubble extends Component {
 
         // speechSynthesis.cancel();
         // speechSynthesis.speak(utterance);
-        axios.post('https://' + window.location.hostname + ':5500/api/audio', {
+        axios.post('http://' + window.location.hostname + ':5500/api/audio', {
             "message": to_speak
         })
             .then(response => {
                 if (response.data === true) {
-                    this.audio.src = 'https://' + window.location.hostname + ':5500/api/playSound'
+                    this.audio.src = 'http://' + window.location.hostname + ':5500/api/playSound'
                     this.audio.playbackRate = 1.2;
                     this.audio.onplay = (event) => {
                         this.setState({isPlaying : true});
                     }
                     this.audio.play().then(() => {
-                        axios.post('https://' + window.location.hostname + ':5500/api/deleteAudio')
+                        axios.post('http://' + window.location.hostname + ':5500/api/deleteAudio')
                     })
                     this.audio.onended = (event) => {
                         this.setState({isPlaying : false});

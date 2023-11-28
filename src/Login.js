@@ -13,7 +13,7 @@ class Login extends Component {
       password: '',
       error: ''
     };
-    this.url = 'https://' + window.location.hostname + ':5500';
+    this.url = 'http://' + window.location.hostname + ':5500';
   }
   handleChange = (event) => {
     const { name, value } = event.target;
@@ -41,11 +41,12 @@ class Login extends Component {
       const { username, password } = this.state;
       this.login(username, password)
         .then(response => {
-          if (response.data === false) {
+          if (response.data['status'] === false) {
             this.setState({ error: 'Invalid Credentials. Please try again' })
           } else {
             window.sessionStorage.setItem('Logged In', true);
             window.sessionStorage.setItem('username', username)
+            window.sessionStorage.setItem('token', response.data['token'])
             this.setState({ error: '' })
 
           }
@@ -63,12 +64,13 @@ class Login extends Component {
     if (username !== '' || password !== '') {
       this.signup(username, password)
         .then(response => {
-          if (response.data === false) {
+          if (response.data['status'] === false) {
             this.setState({ error: 'Credentials already exist' })
           } else {
             this.setState({ error: '' })
             window.sessionStorage.setItem('Logged In', true);
             window.sessionStorage.setItem('username', username)
+            window.sessionStorage.setItem('token', response.data['token'])
           }
         })
     } else {

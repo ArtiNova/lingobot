@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class correctGrammarRequest(BaseModel):
+class correctGrammarRequest(AllReq):
     text : str

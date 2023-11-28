@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 import gpt4all
 from ReqResBody import Request
@@ -10,7 +10,10 @@ from nltk.translate.gleu_score import sentence_gleu
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import string
 from sentence_transformers import SentenceTransformer, util
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from token_passing import AllReq
+import json
+import pymongo
+user_collection = pymongo.MongoClient(json.load(open('./config.json'))['MONGO_URI'])['LingoBot'].get_collection("User")
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
 correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
@@ -32,7 +35,10 @@ translation_model = MBartForConditionalGeneration.from_pretrained("./translation
 tokenizer = MBart50TokenizerFast.from_pretrained("./tokenizer/")
 
 app = FastAPI()
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=['chat2fluency.duckdns.org'])
+
+def authorize(request):
+    res = user_collection.find_one({'token' : request.token})
+    return res['username'] == request.username
 
 origins = [
     "http://localhost",
@@ -102,25 +108,29 @@ async def nameTitle(request : nameTitleRequest):
 
 @app.post('/api/inference')
 async def inference(request : Request):
-    print(request)
-    input_req = request.input
-    context = request.context
-    english_input = translate(input_req, "hi_IN", "en_XX")
-    with model.chat_session():
-        model.current_chat_session = context
-        res = model.generate(english_input, max_tokens=1024)
-        context = model.current_chat_session
-    print(res)
-    #context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
-    return {
-        "result" : (translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
-        "context" : context
-    }
+    if authorize(request):
+        print(request)
+        input_req = request.input
+        context = request.context
+        english_input = translate(input_req, "hi_IN", "en_XX")
+        with model.chat_session():
+            model.current_chat_session = context
+            res = model.generate(english_input, max_tokens=1024)
+            context = model.current_chat_session
+        print(res)
+        #context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
+        return {
+            "result" : (translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
+            "context" : context
+        }
+    return Response(status_code=401) 
 
 @app.post('/api/correctGrammar')
 async def correct_grammar(request : correctGrammarRequest):
-    text = request.text
-    return correct(text)
+    if authorize(request):
+        text = request.text
+        return correct(text)
+    return Response(status_code=401)
     
 
 if __name__ == '__main__':

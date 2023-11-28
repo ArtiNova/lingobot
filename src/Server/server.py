@@ -1,7 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from ReqResBody import Response, Request
 from loginReqRes import LoginRequest
 from pymongo import MongoClient
 import json
@@ -13,13 +12,24 @@ from updateTitle import UpdateTitle
 from AudioRequestResponse import AudioRequest
 from gtts import gTTS
 from fastapi.responses import FileResponse
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from token_passing import AllReq
 
 MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
+
 client = MongoClient(MONGO_URI)
 db = client["LingoBot"]
 user_collection = db.get_collection("Users")
 chat_collection = db.get_collection("Chats")
+
+
+
+import secrets
+
+def generate_random_token(length=32):
+    token = secrets.token_hex(length // 2)
+    while user_collection.find_one({"token" : token}) is not None:
+        token = secrets.token_hex(length // 2)
+    return token
 
 # if not os.path.exists('./translation_model'):
 #     translation_model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50-many-to-many-mmt")
@@ -32,7 +42,7 @@ chat_collection = db.get_collection("Chats")
 # tokenizer = MBart50TokenizerFast.from_pretrained("./tokenizer/")
 
 app = FastAPI()
-app.add_middleware(TrustedHostMiddleware, allowed_hots = ["chat2fluency.duckdns.org"])
+#app.add_middleware(TrustedHostMiddleware, allowed_hosts = ["chat2fluency.duckdns.org"])
 
 origins = [
     "http://localhost",
@@ -47,6 +57,22 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+# @app.middleware("http")
+# async def authorize_request(request : Request, call_next):
+#     if request.get('path') != '/api/login' and request.get('path') != '/api/signup':
+#         body = await request.json()
+#         if user_collection.find_one({'token' : body['token']}) is not None:
+#             print("recieved")
+#             result = await call_next(request)
+#             return result
+#         else:
+#             return Response("You are not authorized!", status_code=401)
+#     else:
+#         print("Here!")
+#         result = await call_next(request)
+#         return result
+
 
 # model = gpt4all.GPT4All(model_name = "ggml-model-gpt4all-falcon-q4_0", model_path = '.')
 
@@ -82,74 +108,96 @@ app.add_middleware(
 #     except:
 #         return Response(result="Internal Server Error 500") 
     
+
+def authorize(request):
+    return user_collection.find_one({'token' : request.token}) is not None
+
 @app.post('/api/login')
 async def login(request : LoginRequest):
     username, password = request.username, request.password
-    return user_collection.find_one({"username" : username, "password" : password}) is not None
+    res = user_collection.find_one({"username" : username, "password" : password})
+    return {"status" : res is not None, "token" : res['token']}
 
 @app.post("/api/signup")
 async def signup(request : LoginRequest):
     username, password = request.username, request.password
     if (user_collection.find_one({"username" : username, "password" : password}) is None):
-        user_collection.insert_one({"username" : username, "password" : password})
-        return True
+        token = generate_random_token(32)
+        user_collection.insert_one({"username" : username, "password" : password, "token" : token})
+        return {"status" : True, 'token' : token}
     return False
 
 @app.post("/api/loadPrevious")
 async def loadPrevious(request : PreviousRequest):
     username, title = request.username, request.title
-    res = chat_collection.find_one({"username" : username, "title" : title})
-    return {
-        "messages" : res["messages"],
-        "context" : res["context"]
-    }
+    if (authorize(request)):
+        res = chat_collection.find_one({"username" : username, "title" : title})
+        return {
+            "messages" : res["messages"],
+            "context" : res["context"]
+        }
+    else:
+        return Response(status_code=401)
 
 @app.post('/api/getPrevious')
 async def getPrevious(request : conversationRequest):
-    res = chat_collection.find({"username" : request.username})
-    titles = []
-    for doc in res:
-        titles.append(doc['title'])
-    return titles
+    if (authorize(request)): 
+        res = chat_collection.find({"username" : request.username})
+        titles = []
+        for doc in res:
+            titles.append(doc['title'])
+        return titles
+    return Response(status_code=401)
 
 @app.post('/api/newChat')
 async def updateChat(request : UpdateChatRequest):
-    username, title = request.username, request.title
-    chat_collection.insert_one({"username" : username, "title" : title, "messages" : list(), "context" :  [{'role': 'system', 'content': ''}]})
-    return True
+    if (authorize(request)):
+        username, title = request.username, request.title
+        chat_collection.insert_one({"username" : username, "title" : title, "messages" : list(), "context" :  [{'role': 'system', 'content': ''}]})
+        return True
+    else:
+        return Response(status_code=401)
 
 @app.post('/api/updateMessages')
 async def updateMessages(request: UpdateCurrentRequest):
-    username, title, messages = request.username, request.title, request.messages
-    chat_collection.update_one({"username" : username, "title" : title}, { "$set" : {
-        "username" : username,
-        "title" : title,
-        "messages" : messages
-    }})
-    return True
+    if (authorize(request)):
+        username, title, messages = request.username, request.title, request.messages
+        chat_collection.update_one({"username" : username, "title" : title}, { "$set" : {
+            "username" : username,
+            "title" : title,
+            "messages" : messages
+        }})
+        return True
+    return Response(status_code=401)
 
 @app.post('/api/deleteConv')
 async def deleteConv(request: UpdateChatRequest):
-    username, title = request.username, request.title
-    chat_collection.delete_one({"username" : username, "title" : title})
-    return True
+    if (authorize(request)):
+        username, title = request.username, request.title
+        chat_collection.delete_one({"username" : username, "title" : title})
+        return True
+    return Response(status_code=401)
 
 @app.post('/api/renameTitle')
 async def renameTitle(request : UpdateTitle):
-    username, oldtitle, newtitle = request.username, request.oldTitle, request.newTitle
-    chat_collection.update_one({"username" : username, "title" : oldtitle}, {"$set" : {
-       "title" : newtitle 
-    }})
-    return True
+    if (authorize(request)):
+        username, oldtitle, newtitle = request.username, request.oldTitle, request.newTitle
+        chat_collection.update_one({"username" : username, "title" : oldtitle}, {"$set" : {
+        "title" : newtitle 
+        }})
+        return True
+    return Response(status_code=401)
 
 @app.post('/api/updateContext')
 async def updateContext(request : UpdateContext):
-    username, title, context = request.username, request.title, request.context
-    chat_collection.update_one({"username" : username, "title" : title}, {
-        "$set" : {
-            "context" : context
-        }
-    })
+    if (authorize(request)):
+        username, title, context = request.username, request.title, request.context
+        chat_collection.update_one({"username" : username, "title" : title}, {
+            "$set" : {
+                "context" : context
+            }
+        })
+    return Response(status_code=401)
 
 @app.post('/api/audio')
 async def createAudio(request : AudioRequest):
@@ -158,11 +206,11 @@ async def createAudio(request : AudioRequest):
     return True
 
 @app.get('/api/playSound')
-async def playSound():
+async def playSound(request : AllReq):
     return FileResponse("output.mp3")
 
 @app.post('/api/deleteAudio')
-async def remove():
+async def remove(request : AllReq):
     os.remove("output.mp3")
     return True
 

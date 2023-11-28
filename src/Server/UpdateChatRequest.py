@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from token_passing import AllReq as BaseModel
 
 
 class UpdateChatRequest(BaseModel):

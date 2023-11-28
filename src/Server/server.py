@@ -13,6 +13,8 @@ from updateTitle import UpdateTitle
 from AudioRequestResponse import AudioRequest
 from gtts import gTTS
 from fastapi.responses import FileResponse
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
 MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
 client = MongoClient(MONGO_URI)
 db = client["LingoBot"]
@@ -30,6 +32,7 @@ chat_collection = db.get_collection("Chats")
 # tokenizer = MBart50TokenizerFast.from_pretrained("./tokenizer/")
 
 app = FastAPI()
+app.add_middleware(TrustedHostMiddleware, allowed_hots = ["chat2fluency.duckdns.org"])
 
 origins = [
     "http://localhost",

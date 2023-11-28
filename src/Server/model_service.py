@@ -10,6 +10,7 @@ from nltk.translate.gleu_score import sentence_gleu
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import string
 from sentence_transformers import SentenceTransformer, util
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
 correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
@@ -31,6 +32,7 @@ translation_model = MBartForConditionalGeneration.from_pretrained("./translation
 tokenizer = MBart50TokenizerFast.from_pretrained("./tokenizer/")
 
 app = FastAPI()
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=['chat2fluency.duckdns.org'])
 
 origins = [
     "http://localhost",

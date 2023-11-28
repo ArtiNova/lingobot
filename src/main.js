@@ -25,8 +25,8 @@ class Main extends Component {
             newTitle: '',
             sidebar_collapsed: false,
         };
-        this.server = 'http://' + window.location.hostname + ':5500';
-        this.model = 'http://' + window.location.hostname + ':5501';
+        this.server = 'https://' + window.location.hostname + ':5500';
+        this.model = 'https://' + window.location.hostname + ':5501';
     }
 
     componentDidMount() {

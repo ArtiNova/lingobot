@@ -17,18 +17,18 @@ class Main extends Component {
         this.state = {
             messages: [],
             userInput: '',
-            context: '',
+            context: [{ 'role': 'system', 'content': '' }],
             isLoading: false,
             previous: [],
             selectedConv: '',
             editingIndex: null,
             newTitle: '',
-            sidebar_collapsed : false,
+            sidebar_collapsed: false,
         };
         this.server = 'http://' + window.location.hostname + ':5500';
-        this.model =  'http://' + window.location.hostname + ':5501';
+        this.model = 'http://' + window.location.hostname + ':5501';
     }
-    
+
     componentDidMount() {
         this.getPrevious()
             .then(response => {
@@ -38,19 +38,22 @@ class Main extends Component {
 
     addNewChat = () => {
         axios.post(this.server + "/api/newChat", {
+            "token" : window.sessionStorage.getItem("token"),
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
-        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: '' })
+        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{ 'role': 'system', 'content': '' }] })
     }
 
     handleSend = (event) => {
+        let input = this.state.userInput;
         if (this.state.userInput.trim() !== '') {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
-                this.setState({messages : [this.state.userInput]});
+                this.setState({ messages: [this.state.userInput] });
             }
             axios.post(this.model + "/api/correctGrammar", {
+                "token" : window.sessionStorage.getItem("token"),
                 "text": this.state.userInput
             })
                 .then(response => {
@@ -63,63 +66,69 @@ class Main extends Component {
                         }
                         this.setState({ messages: msgs })
                         axios.post(this.server + '/api/updateMessages', {
+                            "token" : window.sessionStorage.getItem("token"),
                             "username": window.sessionStorage.getItem("username"),
                             "messages": this.state.messages,
                             "title": this.state.selectedConv
                         })
 
                     }
-                })
-                .catch(err => {})
-            this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
-            axios.post(this.model + "/api/inference", {
-                "input": this.state.userInput,
-                "context": this.state.context
-            })
-                .then(response => {
-                    axios.post(this.server + "/api/updateContext", {
-                        "username": window.sessionStorage.getItem("username"),
-                        "title": this.state.selectedConv,
-                        "context": response.data.context
+                    axios.post(this.model + "/api/inference", {
+                        "token" : window.sessionStorage.getItem("token"),
+                        "input": (response.data === '') ? input : response.data,
+                        "context": this.state.context
                     })
-                    axios.post(this.server + "/api/updateMessages", {
-                        "username": window.sessionStorage.getItem("username"),
-                        "messages": [...this.state.messages, response.data.result],
-                        "title": this.state.selectedConv
-                    })
-                    this.setState({ messages: [...this.state.messages, response.data.result], isLoading: false, context: response.data.context })
-                    if (this.state.selectedConv.startsWith("New Chat")) {
-                        axios.post(this.model + "/api/nameTitle", {
-                            question: response.data.context
-                        }).then(response => {
-                            let index = this.state.previous.indexOf(this.state.selectedConv)
-                            let prev_temp = this.state.previous
-                            const oldTitle = this.state.selectedConv
-                            prev_temp[index] = response.data
-                            this.setState({ previous: prev_temp })
-                            axios.post(this.server + "/api/renameTitle", {
+                        .then(response => {
+                            axios.post(this.server + "/api/updateContext", {
+                                "token" : window.sessionStorage.getItem("token"),
                                 "username": window.sessionStorage.getItem("username"),
-                                "oldTitle": oldTitle,
-                                "newTitle": response.data
+                                "title": this.state.selectedConv,
+                                "context": response.data.context
                             })
-                            .catch(err => {
+                            axios.post(this.server + "/api/updateMessages", {
+                                "token" : window.sessionStorage.getItem("token"),
+                                "username": window.sessionStorage.getItem("username"),
+                                "messages": [...this.state.messages, response.data.result.trim()],
+                                "title": this.state.selectedConv
                             })
+                                .then(re => {
+                                    if (re.data === true) {
+                                        if (this.state.selectedConv.startsWith("New Chat")) {
+                                            let index = this.state.previous.indexOf(this.state.selectedConv);
+                                            const oldTitle = this.state.selectedConv;
+                                            let prev_temp = this.state.previous;
+                                            prev_temp[index] = input
+                                            this.setState({previoud : prev_temp});
+                                            axios.post(this.server + '/api/renameTitle', {
+                                                "token" : window.sessionStorage.getItem("token"),
+                                                "username": window.sessionStorage.getItem("username"),
+                                                "oldTitle": oldTitle,
+                                                "newTitle": prev_temp[index]
+                                            })
+                                                .then(res => {
+                                                    if (res.data === true) {
+                                                        this.setState({ previous: prev_temp, selectedConv : prev_temp[index]});
+                                                    }
+                                                })
+                                        }
+                                    }
+                                })
+                            this.setState({ messages: [...this.state.messages, response.data.result.trim()], isLoading: false, context: response.data.context })
                         })
-                        .catch(err => {
-                            
+                        .catch(error => {
+                            this.setState({ isLoading: false });
+                            alert(error)
                         })
-                    }
                 })
-                .catch(error => {
-                    this.setState({isLoading : false});
-                    alert(error)
-                })
+                .catch(err => { })
+            this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
         }
     }
 
     loadPrevious = (event) => {
         if (this.state.editingIndex === null) {
             axios.post(this.server + "/api/loadPrevious", {
+                "token" : window.sessionStorage.getItem("token"),
                 "username": window.sessionStorage.getItem("username"),
                 "title": event.target.innerHTML
             })
@@ -137,6 +146,7 @@ class Main extends Component {
     getPrevious = () => {
         const username = window.sessionStorage.getItem("username")
         return axios.post(this.server + "/api/getPrevious", {
+            "token" : window.sessionStorage.getItem("token"),
             "username": username
         })
     }
@@ -153,7 +163,7 @@ class Main extends Component {
 
         recognition.onresult = (event) => {
             const recognizedText = event.results[0][0].transcript;
-            this.setState({userInput : recognizedText});
+            this.setState({ userInput: recognizedText });
             document.getElementById("input").focus({ focusVisible: true });
         }
 
@@ -168,8 +178,9 @@ class Main extends Component {
         const updatedPrevious = [...this.state.previous];
         const title = updatedPrevious[index]
         updatedPrevious.splice(index, 1);
-        this.setState({ previous: updatedPrevious, messages: [], context: '', selectedConv : '' });
+        this.setState({ previous: updatedPrevious, messages: [], context: '', selectedConv: '' });
         axios.post(this.server + "/api/deleteConv", {
+            "token" : window.sessionStorage.getItem("token"),
             username: window.sessionStorage.getItem("username"),
             "title": title
         })
@@ -180,6 +191,7 @@ class Main extends Component {
         updatePrevious[index] = newTitle;
         this.setState({ previous: updatePrevious });
         axios.post(this.server + "/api/renameTitle", {
+            "token" : window.sessionStorage.getItem("token"),
             "username": window.sessionStorage.getItem("username"),
             "oldTitle": oldTitle,
             "newTitle": newTitle
@@ -203,24 +215,24 @@ class Main extends Component {
                     <h2>Previous Conversations</h2>
                     <button className='sidebar-button' onClick={this.addNewChat}><h3>+ New Chat</h3></button>
                     <div className="sidebar-conversation-holder">
-                    <ul>
-                        {this.state.previous.map((title, index) => (
-                            <div key={index} className="sidebar-button-container">
-                                {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value={this.state.newTitle} onChange={(event) => { this.setState({ newTitle: event.target.value }) }} onKeyDown={(event) => { if (event.key === 'Enter') { this.rename(title, event.target.value, index) } }}></input> :
-                                    <button id={index} className='sidebar-button' onClick={this.loadPrevious} disabled = {this.state.isLoading}>
-                                        {title}
+                        <ul>
+                            {this.state.previous.map((title, index) => (
+                                <div key={index} className="sidebar-button-container">
+                                    {(index === this.state.editingIndex) ? <input type='text' autoFocus className='editing-input' value={this.state.newTitle} onChange={(event) => { this.setState({ newTitle: event.target.value }) }} onKeyDown={(event) => { if (event.key === 'Enter') { this.rename(title, event.target.value, index) } }}></input> :
+                                        <button id={index} className='sidebar-button' onClick={this.loadPrevious} disabled={this.state.isLoading}>
+                                            {title}
+                                        </button>
+                                    }
+                                    {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : null}
+                                    <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
+                                        {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : null}
                                     </button>
-                                }
-                                {(this.state.editingIndex === null) ? <button className='delete-button' onClick={() => { this.setState({ editingIndex: index, newTitle: title }) }}><img className='edit-logo' alt={"rename"} src={editLogo}></img></button> : null}
-                                <button className='delete-button' onClick={() => this.handleDeleteConversation(index)}>
-                                    {(this.state.editingIndex === null) ? <img className='edit-logo' alt={"delete"} src={delete_logo}></img> : null}
-                                </button>
-                            </div>
-                        ))}
-                    </ul>
+                                </div>
+                            ))}
+                        </ul>
                     </div>
                 </div> : null}
-                <button className='collapse-button' onClick={() => this.setState({sidebar_collapsed : !this.state.sidebar_collapsed})}><img className='direction-img' alt='arrow' src = {(this.state.sidebar_collapsed === false) ? open : close}></img></button>
+                <button className='collapse-button' onClick={() => this.setState({ sidebar_collapsed: !this.state.sidebar_collapsed })}><img className='direction-img' alt='arrow' src={(this.state.sidebar_collapsed === false) ? open : close}></img></button>
                 <div className="chat-interface">
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (
@@ -238,9 +250,9 @@ class Main extends Component {
                             onKeyDown={this.handleEnter}
                             id='input'
                         />
-                        { (this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
-                                <img alt="mic" className = 'mic-symbol' src={mic_logo}></img>
-                            </button> : null
+                        {(this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
+                            <img alt="mic" className='mic-symbol' src={mic_logo}></img>
+                        </button> : null
                         }
                         {(this.state.isLoading === false) ?
                             <button className='Submit-button' onClick={this.handleSend} disabled={this.state.isLoading}>

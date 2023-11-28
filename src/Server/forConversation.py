@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class conversationRequest(BaseModel):
+class conversationRequest(AllReq):
     username : str
 
-class conversationResponse(BaseModel):
+class conversationResponse(AllReq):
     titles : list

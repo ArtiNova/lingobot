@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class UpdateTitle(BaseModel):
+class UpdateTitle(AllReq):
     username: str
     oldTitle : str
     newTitle : str

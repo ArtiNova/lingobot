@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from token_passing import AllReq
 
-class nameTitleRequest(BaseModel):
-    question : str
+class nameTitleRequest(AllReq):
+    question : list[dict]

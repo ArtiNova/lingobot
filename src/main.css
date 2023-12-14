@@ -112,6 +112,23 @@ body {
   white-space: pre-wrap;
 }
 
+.drop-down-for-languages {
+  background-color: rgb(53, 53, 53);
+  color : white;
+  border: none;
+  left:250px;
+  scroll-behavior: smooth;
+  border-radius: 1cm;
+  height: 0.9cm;
+  align-items: center;
+  width: fit-content;
+}
+
+.lang-options {
+  align-items: center;
+}
+
+
 .chat-bubble {
   background-color: #007bff;
   color: #fff;
@@ -131,11 +148,10 @@ body {
   align-items: center;
   position: fixed;
   bottom: 0;
-  left: 1;
   right: 1%;
   background-color: rgba(18, 18, 18);
   padding: 10px;
-  width: 78%;
+  width: 70%;
 }
 
 .user-input .mic-symbol {
@@ -146,7 +162,7 @@ body {
 .user-input .mic-button {
   position: absolute;
   top: 10px;
-  right: 67px;
+  right: 160px;
   padding: 10px 20px;
   font-size: 16px;
   background-color: transparent;
@@ -161,7 +177,7 @@ body {
 }
 
 .user-input input {
-  width: 60%;
+  width: 50%;
   padding: 5px;
   height: 28px;
   margin-right: 10px;
@@ -171,7 +187,7 @@ body {
   background-color: rgba(66, 66, 66);
   color: whitesmoke;
   flex-grow: 1;
-  font-size: large;
+  font-size: medium;
   border-radius: 5cm;
 }
 
@@ -186,6 +202,7 @@ body {
   box-shadow: 0px 5px 0px 0px #000;
   overflow: hidden;
   position: relative;
+  right: 5px;
 }
 
 .user-input .Submit-button:hover {

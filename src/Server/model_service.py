@@ -13,16 +13,16 @@ from sentence_transformers import SentenceTransformer, util
 from token_passing import AllReq
 import json
 import pymongo
-user_collection = pymongo.MongoClient(json.load(open('./config.json'))['MONGO_URI'])['LingoBot'].get_collection("User")
+user_collection = pymongo.MongoClient(json.load(open('./config.json'))['MONGO_URI'])['LingoBot'].get_collection("Users")
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
 correction_tokenizer = AutoTokenizer.from_pretrained("./v5/tokenizer")
 
-if not os.path.exists('./similarity/'):
-    semantic_sim_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-    semantic_sim_model.save('./similarity/')
-else:
-    semantic_sim_model = SentenceTransformer('./similarity/')
+# if not os.path.exists('./similarity/'):
+#     semantic_sim_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+#     semantic_sim_model.save('./similarity/')
+# else:
+#     semantic_sim_model = SentenceTransformer('./similarity/')
 
 if not os.path.exists('./translation_model'):
     translation_model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50-many-to-many-mmt")
@@ -34,15 +34,20 @@ if not os.path.exists('./tokenizer'):
 translation_model = MBartForConditionalGeneration.from_pretrained("./translation_model/")
 tokenizer = MBart50TokenizerFast.from_pretrained("./tokenizer/")
 
+token_cache = {}
+
 app = FastAPI()
 
 def authorize(request):
-    res = user_collection.find_one({'token' : request.token})
-    return res['username'] == request.username
+    if token_cache.get(request.token) == True:
+        return True
+    res = user_collection.find_one({'token' : request.token}) is not None
+    token_cache[request.token] = res
+    return res
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    "https://chat2fluency.duckdns.org",
+    "https://chat2fluency.duckdns.org/chat",
     '*'
 ]
 
@@ -73,7 +78,7 @@ Analyze this conversation and name the conversation with a creative single word 
 """
 
 def preprocess_result(text):
-    return ''.join(list(filter(lambda x: x not in string.punctuation, text))).strip()
+    return ''.join(list(filter(lambda x: x not in string.punctuation and x != '।', text))).strip()
 
 def translate(txt, src, to):
     tokenizer.src_lang = src
@@ -82,7 +87,10 @@ def translate(txt, src, to):
     return tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
 
 def correct(text):
-    if not any(map(lambda x: (ord(x) >= 65 and ord(x) <= 122) or ord(x) == 32, text)):
+    to_check = preprocess_result(text)
+    if not any(map(lambda x: (ord(x) >= 65 and ord(x) <= 122), to_check)):
+        if '।' not in text:
+            text += '।'
         inputs = correction_tokenizer(text, return_tensors="pt")
         max_length = 200  
         generated = correction_model.generate(inputs["input_ids"], max_length=max_length, num_return_sequences=1)
@@ -90,10 +98,10 @@ def correct(text):
         corrected_text_2 = translate(translate(text, "hi_IN", "en_XX"), "en_XX", "hi_IN")
         if preprocess_result(text) == preprocess_result(corrected_text_2):
             return ''
-        score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()
-        if score >= 0.9:
-            return corrected_text_2
-        return ''
+        # score = util.pytorch_cos_sim(semantic_sim_model.encode(corrected_text, convert_to_tensor=True), semantic_sim_model.encode(corrected_text_2, convert_to_tensor=True))[0][0].item()
+        if preprocess_result(corrected_text) == preprocess_result(corrected_text_2):
+            return corrected_text
+        return corrected_text_2
     return ''
 
 @app.post('/api/nameTitle')
@@ -112,7 +120,7 @@ async def inference(request : Request):
         print(request)
         input_req = request.input
         context = request.context
-        english_input = translate(input_req, "hi_IN", "en_XX")
+        english_input = translate(input_req, request.lang.replace('-', '_'), "en_XX")
         with model.chat_session():
             model.current_chat_session = context
             res = model.generate(english_input, max_tokens=1024)
@@ -120,7 +128,7 @@ async def inference(request : Request):
         print(res)
         #context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
         return {
-            "result" : (translate(res, "en_XX", "hi_IN") + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
+            "result" : (translate(res, "en_XX", request.lang.replace('-', '_')) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
             "context" : context
         }
     return Response(status_code=401) 
@@ -129,7 +137,9 @@ async def inference(request : Request):
 async def correct_grammar(request : correctGrammarRequest):
     if authorize(request):
         text = request.text
-        return correct(text)
+        if request.lang == 'Hindi':
+            return correct(text)
+        return ''
     return Response(status_code=401)
     
 

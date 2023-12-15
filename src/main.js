@@ -163,7 +163,7 @@ class Main extends Component {
                 .then(response => {
                     this.setState({ messages: response.data.messages, newChatCount: response.data.messages.length })
                     this.setState({ context: response.data.context })
-                    let lang = (this.state.messages.length > 0) ? Object.keys(this.state.lang_to_code).find(key => this.state.lang_to_code[key] === response.data.messages.at(-1).lang) : 'Hindi'
+                    let lang = (response.data.messages.length > 0) ? Object.keys(this.state.lang_to_code).find(key => this.state.lang_to_code[key] === response.data.messages.at(-1).lang) : 'Hindi'
                     this.setState({ selectedConv: event.target.innerHTML, language : lang})
                 })
                 .catch(error => {

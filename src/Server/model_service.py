@@ -13,6 +13,11 @@ from sentence_transformers import SentenceTransformer, util
 from token_passing import AllReq
 import json
 import pymongo
+import pickle
+
+with open('./languages.pkl', 'rb') as f:
+    lang_code_mapping = pickle.load(f)
+
 user_collection = pymongo.MongoClient(json.load(open('./config.json'))['MONGO_URI'])['LingoBot'].get_collection("Users")
 
 correction_model = AutoModelForSeq2SeqLM.from_pretrained("./v5/model")
@@ -139,7 +144,8 @@ async def correct_grammar(request : correctGrammarRequest):
         text = request.text
         if request.lang == 'Hindi':
             return correct(text)
-        return ''
+        correction = translate(translate(text, lang_code_mapping[request.lang], "en_XX"), "en_XX", lang_code_mapping[request.lang])
+        return correction if correction != text else ''
     return Response(status_code=401)
     
 

@@ -194,7 +194,7 @@ async def updateContext(request : UpdateContext):
 
 @app.post('/api/audio')
 async def createAudio(request : AudioRequest):
-    tts = gTTS(text=request.message, lang=request.lang.split('-')[0], slow=False)
+    tts = gTTS(text=request.message, lang=request.lang.split('-')[0], slow=True)
     tts.save('output.mp3')
     return True
 

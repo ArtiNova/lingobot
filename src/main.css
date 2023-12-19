@@ -9,7 +9,61 @@ body {
   body {
       font-size: 16px;
   }
+
+  .container {
+    flex-direction: row; /* Adjust layout for larger screens */
+  }
+
+  .sidebar {
+    max-width: none; /* Remove max-width for larger screens */
+  }
+
+  .sidebar-conversation-holder {
+    max-width: none; /* Remove max-width for larger screens */
+  }
+
+  .chat-interface {
+    max-width: none; /* Remove max-width for larger screens */
+  }
+
+  .user-input {
+    width: 30%; /* Adjust input width for larger screens */
+  }
 }
+
+.container {
+  display: flex;
+  flex-direction: column; /* Adjust layout for smaller screens */
+}
+
+.sidebar {
+  max-width: none; /* Remove max-width for smaller screens */
+}
+
+.sidebar-conversation-holder {
+  max-width: none; /* Remove max-width for smaller screens */
+}
+
+.sidebar-conversation-holder {
+  padding-right: 0; /* Adjust padding for smaller screens */
+}
+
+.user-input {
+  width: 100%; /* Full width for smaller screens */
+}
+
+.user-input input {
+  width: 70%; /* Adjust input width for smaller screens */
+}
+
+.sidebar-conversation-holder,
+.sidebar {
+  max-width: 100%; /* Ensure elements don't exceed screen width */
+}
+
+/* Add more media queries as needed for different screen sizes */
+
+
 
 .container {
   display: flex;

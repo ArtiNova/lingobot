@@ -135,7 +135,7 @@ async def inference(request : Request):
             model_output = model.generate(english_input, max_tokens=1024)
             context = model.current_chat_session
         if request.lang not in lang_code_mapping.values():
-            result = (Translator(to_lang=request.lang.split('-')[0], from_lang='en').translate(model_output) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + model_output).strip()
+            result = (Translator(to_lang=request.lang.split('-')[0], from_lang='en').translate(model_output).strip() + '\n' + ('-' * 10) + '\n' + 'FYI : ' + model_output).strip()
         else:
             result = (translate(model_output, "en_XX", request.lang.replace('-', '_')) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + model_output).strip()
         return {

@@ -14,6 +14,7 @@ from token_passing import AllReq
 import json
 import pymongo
 import pickle
+from translate import Translator
 
 with open('./languages.pkl', 'rb') as f:
     lang_code_mapping = pickle.load(f)
@@ -125,15 +126,20 @@ async def inference(request : Request):
         print(request)
         input_req = request.input
         context = request.context
-        english_input = translate(input_req, request.lang.replace('-', '_'), "en_XX")
+        if request.lang not in lang_code_mapping.values():
+            english_input = Translator(from_lang=request.lang.split('-')[0], to_lang='en').translate(input_req)
+        else:
+            english_input = translate(input_req, request.lang.replace('-', '_'), "en_XX")
         with model.chat_session():
             model.current_chat_session = context
-            res = model.generate(english_input, max_tokens=1024)
+            model_output = model.generate(english_input, max_tokens=1024)
             context = model.current_chat_session
-        print(res)
-        #context += ("Human: " + english_input + '\n' + "AI: " + res + '\n')
+        if request.lang not in lang_code_mapping.values():
+            result = (Translator(to_lang=request.lang.split('-')[0], from_lang='en').translate(model_output) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + model_output).strip()
+        else:
+            result = (translate(model_output, "en_XX", request.lang.replace('-', '_')) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + model_output).strip()
         return {
-            "result" : (translate(res, "en_XX", request.lang.replace('-', '_')) + '\n' + ('-' * 10) + '\n' + 'FYI : ' + res).strip(),
+            "result" : result, 
             "context" : context
         }
     return Response(status_code=401) 
@@ -144,8 +150,7 @@ async def correct_grammar(request : correctGrammarRequest):
         text = request.text
         if request.lang == 'Hindi':
             return correct(text)
-        correction = translate(translate(text, lang_code_mapping[request.lang], "en_XX"), "en_XX", lang_code_mapping[request.lang])
-        return correction if correction != text else ''
+        return ''
     return Response(status_code=401)
     
 

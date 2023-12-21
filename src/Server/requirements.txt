@@ -6,3 +6,4 @@ accelerate
 pymongo
 uvicorn
 gTTS
+translate

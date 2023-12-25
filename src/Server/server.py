@@ -14,7 +14,9 @@ from gtts import gTTS
 from fastapi.responses import FileResponse
 from token_passing import AllReq
 
-MONGO_URI = json.load(open('./config.json'))["MONGO_URI"]
+with open('./config.json') as f:
+    data = json.load(f)
+    MONGO_URI, LANGUAGES = data['MONGO_URI'], data['LANGUAGES']
 
 client = MongoClient(MONGO_URI)
 db = client["LingoBot"]
@@ -22,7 +24,7 @@ user_collection = db.get_collection("Users")
 chat_collection = db.get_collection("Chats")
 
 
-
+token_cache = {}
 import secrets
 
 def generate_random_token(length=32):
@@ -45,8 +47,8 @@ app = FastAPI()
 #app.add_middleware(TrustedHostMiddleware, allowed_hosts = ["chat2fluency.duckdns.org"])
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    "https://chat2fluency.duckdns.org",
+    "https://chat2fluency.duckdns.org/chat",
     '*'
 ]
 
@@ -58,20 +60,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.middleware("http")
-# async def authorize_request(request : Request, call_next):
-#     if request.get('path') != '/api/login' and request.get('path') != '/api/signup':
-#         body = await request.json()
-#         if user_collection.find_one({'token' : body['token']}) is not None:
-#             print("recieved")
-#             result = await call_next(request)
-#             return result
-#         else:
-#             return Response("You are not authorized!", status_code=401)
-#     else:
-#         print("Here!")
-#         result = await call_next(request)
-#         return result
 
 
 # model = gpt4all.GPT4All(model_name = "ggml-model-gpt4all-falcon-q4_0", model_path = '.')
@@ -110,13 +98,17 @@ app.add_middleware(
     
 
 def authorize(request):
-    return user_collection.find_one({'token' : request.token}) is not None
+    if token_cache.get(request.token) == True:
+        return True
+    res = user_collection.find_one({'token' : request.token}) is not None
+    token_cache[request.token] = res
+    return res
 
 @app.post('/api/login')
 async def login(request : LoginRequest):
     username, password = request.username, request.password
     res = user_collection.find_one({"username" : username, "password" : password})
-    return {"status" : res is not None, "token" : res['token']}
+    return {"status" : res is not None, "token" : res['token'] if res is not None else None}
 
 @app.post("/api/signup")
 async def signup(request : LoginRequest):
@@ -197,20 +189,31 @@ async def updateContext(request : UpdateContext):
                 "context" : context
             }
         })
+        return True
     return Response(status_code=401)
 
 @app.post('/api/audio')
 async def createAudio(request : AudioRequest):
-    tts = gTTS(text=request.message, lang='hi', slow=False)
+    tts = gTTS(text=request.message, lang=request.lang.split('-')[0], slow=True)
     tts.save('output.mp3')
     return True
 
+@app.get('/api/languages')
+async def send_available_languages():
+    underscore_to_hiphen = {}
+    for i in LANGUAGES:
+        underscore_to_hiphen[i] = LANGUAGES[i].replace('_', '-')
+    return {
+        "languages" : list(LANGUAGES.keys()),
+        "lang-to-code" : underscore_to_hiphen
+    }
+
 @app.get('/api/playSound')
-async def playSound(request : AllReq):
+async def playSound():
     return FileResponse("output.mp3")
 
 @app.post('/api/deleteAudio')
-async def remove(request : AllReq):
+async def remove():
     os.remove("output.mp3")
     return True
 

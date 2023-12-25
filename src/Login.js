@@ -13,7 +13,7 @@ class Login extends Component {
       password: '',
       error: ''
     };
-    this.url = 'http://' + window.location.hostname + ':5500';
+    this.url = 'https://' + window.location.hostname + ':5500';
   }
   handleChange = (event) => {
     const { name, value } = event.target;

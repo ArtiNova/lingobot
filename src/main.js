@@ -24,9 +24,12 @@ class Main extends Component {
             editingIndex: null,
             newTitle: '',
             sidebar_collapsed: false,
+            available_languages : [],
+            language : '',
+            lang_to_code : {}
         };
-        this.server = 'http://' + window.location.hostname + ':5500';
-        this.model = 'http://' + window.location.hostname + ':5501';
+        this.server = 'https://' + window.location.hostname + ':5500';
+        this.model = 'https://' + window.location.hostname + ':5501';
     }
 
     componentDidMount() {
@@ -34,7 +37,21 @@ class Main extends Component {
             .then(response => {
                 this.setState({ previous: response.data })
             })
+        setInterval(() => {
+            this.getPrevious()
+            .then(response => {
+                this.setState({ previous: response.data })
+            })
+
+        }, 10000)
+        axios.get(this.server + '/api/languages')
+        .then(response => {
+            this.setState({available_languages : response.data['languages'], lang_to_code : response.data['lang-to-code']})
+            this.setState({language : this.state.available_languages[0]})
+        })
+
     }
+
 
     addNewChat = () => {
         axios.post(this.server + "/api/newChat", {
@@ -42,7 +59,7 @@ class Main extends Component {
             "username": window.sessionStorage.getItem("username"),
             "title": "New Chat " + this.state.previous.length
         })
-        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{ 'role': 'system', 'content': '' }] })
+        this.setState({ selectedConv: "New Chat " + this.state.previous.length, previous: [...this.state.previous, "New Chat " + this.state.previous.length], messages: [], context: [{ 'role': 'system', 'content': '' }]})
     }
 
     handleSend = (event) => {
@@ -50,19 +67,20 @@ class Main extends Component {
         if (this.state.userInput.trim() !== '') {
             if (this.state.selectedConv === '') {
                 this.addNewChat();
-                this.setState({ messages: [this.state.userInput] });
+                this.setState({ messages: [{'message' : this.state.userInput, 'lang' : this.state.lang_to_code[this.state.language]}] });
             }
             axios.post(this.model + "/api/correctGrammar", {
                 "token" : window.sessionStorage.getItem("token"),
-                "text": this.state.userInput
+                "text": this.state.userInput,
+                'lang' : this.state.language
             })
                 .then(response => {
                     if (response.data !== '') {
                         let msgs = this.state.messages
                         if (msgs.length % 2) {
-                            msgs[msgs.length - 1] += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
+                            msgs[msgs.length - 1].message += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
                         } else {
-                            msgs[msgs.length - 2] += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
+                            msgs[msgs.length - 2].message += '\n' + "-".padStart(response.data.length, '-') + '\n You should have said : ' + response.data;
                         }
                         this.setState({ messages: msgs })
                         axios.post(this.server + '/api/updateMessages', {
@@ -76,7 +94,8 @@ class Main extends Component {
                     axios.post(this.model + "/api/inference", {
                         "token" : window.sessionStorage.getItem("token"),
                         "input": (response.data === '') ? input : response.data,
-                        "context": this.state.context
+                        "context": this.state.context,
+                        "lang" : this.state.lang_to_code[this.state.language]
                     })
                         .then(response => {
                             axios.post(this.server + "/api/updateContext", {
@@ -88,7 +107,7 @@ class Main extends Component {
                             axios.post(this.server + "/api/updateMessages", {
                                 "token" : window.sessionStorage.getItem("token"),
                                 "username": window.sessionStorage.getItem("username"),
-                                "messages": [...this.state.messages, response.data.result.trim()],
+                                "messages": [...this.state.messages, {'message' : response.data.result.trim(), 'lang' : this.state.lang_to_code[this.state.language]}],
                                 "title": this.state.selectedConv
                             })
                                 .then(re => {
@@ -97,6 +116,15 @@ class Main extends Component {
                                             let index = this.state.previous.indexOf(this.state.selectedConv);
                                             const oldTitle = this.state.selectedConv;
                                             let prev_temp = this.state.previous;
+                                            if (prev_temp.indexOf(input)!== -1){
+                                                let count = 0;
+                                                prev_temp.forEach(element => {
+                                                    if (element === input) {
+                                                        ++count;
+                                                    }
+                                                })
+                                                input += count;
+                                            }
                                             prev_temp[index] = input
                                             this.setState({previoud : prev_temp});
                                             axios.post(this.server + '/api/renameTitle', {
@@ -113,7 +141,7 @@ class Main extends Component {
                                         }
                                     }
                                 })
-                            this.setState({ messages: [...this.state.messages, response.data.result.trim()], isLoading: false, context: response.data.context })
+                            this.setState({ messages: [...this.state.messages, {'message' : response.data.result.trim(), 'lang' : this.state.lang_to_code[this.state.language]}], isLoading: false, context: response.data.context })
                         })
                         .catch(error => {
                             this.setState({ isLoading: false });
@@ -121,7 +149,7 @@ class Main extends Component {
                         })
                 })
                 .catch(err => { })
-            this.setState({ messages: [...this.state.messages, this.state.userInput], userInput: '', isLoading: true })
+            this.setState({ messages: [...this.state.messages, {'message' : this.state.userInput, 'lang' : this.state.lang_to_code[this.state.language]}], userInput: '', isLoading: true })
         }
     }
 
@@ -135,11 +163,12 @@ class Main extends Component {
                 .then(response => {
                     this.setState({ messages: response.data.messages, newChatCount: response.data.messages.length })
                     this.setState({ context: response.data.context })
+                    let lang = (response.data.messages.length > 0) ? Object.keys(this.state.lang_to_code).find(key => this.state.lang_to_code[key] === response.data.messages.at(-1).lang) : 'Hindi'
+                    this.setState({ selectedConv: event.target.innerHTML, language : lang})
                 })
                 .catch(error => {
                     alert(error)
                 })
-            this.setState({ selectedConv: event.target.innerHTML })
         }
     }
 
@@ -157,9 +186,9 @@ class Main extends Component {
         }
     }
 
-    startRecognition = () => {
+    startRecognition = (lang_code) => {
         const recognition = new window.webkitSpeechRecognition();
-        recognition.lang = 'hi-IN';
+        recognition.lang = lang_code
 
         recognition.onresult = (event) => {
             const recognizedText = event.results[0][0].transcript;
@@ -237,7 +266,7 @@ class Main extends Component {
                     <div className="chat-messages">
                         {this.state.messages.map((message, index) => (
                             <div key={index} className={index % 2 === 0 ? 'user-message' : 'ai-message'}>
-                                <ChatBubble message={message} avatar={index % 2 === 0 ? userAvatar : aiAvatar} />
+                                <ChatBubble message={message.message} lang = {message.lang} avatar={index % 2 === 0 ? userAvatar : aiAvatar} />
                             </div>
                         ))}
                     </div>
@@ -250,14 +279,25 @@ class Main extends Component {
                             onKeyDown={this.handleEnter}
                             id='input'
                         />
-                        {(this.state.userInput === '') ? <button className='mic-button' onClick={this.startRecognition}>
+                        {(this.state.userInput === '' && this.state.isLoading === false) ? <button className='mic-button' onClick={(event) => this.startRecognition(this.state.lang_to_code[this.state.language])}>
                             <img alt="mic" className='mic-symbol' src={mic_logo}></img>
                         </button> : null
                         }
                         {(this.state.isLoading === false) ?
-                            <button className='Submit-button' onClick={this.handleSend} disabled={this.state.isLoading}>
-                                ▶
-                            </button> : <div className="dot-falling-container">
+                            <div className='input-elements'>
+                                <button className='Submit-button' onClick={this.handleSend} disabled={this.state.isLoading}>
+                                    ▶
+                                </button> 
+                                <select className = 'drop-down-for-languages' name={"Languages"} value={this.state.language} onChange={(event) => {this.setState({language : event.target.value})}}>
+                                    {
+                                        this.state.available_languages.map((lang, index) => (
+                                            <option className='lang-options' value={lang} key={index}>{lang}</option>
+                                        ))
+                                    }
+                                    
+                                </select>
+                            </div>
+                            : <div className="dot-falling-container">
                                 <div className="stage">
                                     <div className="dot-falling"></div>
                                 </div>
